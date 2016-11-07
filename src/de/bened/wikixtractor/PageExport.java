@@ -1,10 +1,5 @@
 package de.bened.wikixtractor;
 
-/**
- * Created by xuiqzy on 11/3/16.
- */
-
-
 import java.io.File;
 import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
@@ -20,13 +15,11 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class PageExport {
+/**
+ * Created by xuiqzy on 11/3/16.
+ */
 
-    public static void main(String argv[]) {
-
-
-
-    }
+class PageExport {
 
     static void exportPages(Set<Page> pages){
 
@@ -47,15 +40,15 @@ public class PageExport {
 
                 // set attributes to page element
                 Attr pageID = doc.createAttribute("pageID");
-                pageID.setValue(currentPage.getPageID());
+                pageID.setValue(String.valueOf(currentPage.getPageID()));
                 page.setAttributeNode(pageID);
 
                 Attr namespaceID = doc.createAttribute("namespaceID");
-                namespaceID.setValue(currentPage.getNamespaceID);
+                namespaceID.setValue(String.valueOf(currentPage.getNamespaceID()));
                 page.setAttributeNode(namespaceID);
 
                 Attr title = doc.createAttribute("title");
-                title.setValue(currentPage.getTitle);
+                title.setValue(String.valueOf(currentPage.getTitle()));
                 page.setAttributeNode(title);
 
                 // shorten way
@@ -66,13 +59,13 @@ public class PageExport {
                 page.appendChild(categories);
 
                 // category element
-                for(Category currentCategory : currentPage.categories) {
+                for(String currentCategory : currentPage.getCategories()) {
                     Element category = doc.createElement("category");
                     categories.appendChild(category);
 
                     // set attributes to category
                     Attr name = doc.createAttribute("name");
-                    name.setValue(currentCategory.getCategory);
+                    name.setValue(currentCategory);
                     category.setAttributeNode(name);
                 }
 
@@ -93,10 +86,8 @@ public class PageExport {
 
             System.out.println("File saved!");
 
-        } catch (ParserConfigurationException pce) {
+        } catch (ParserConfigurationException | TransformerException pce) {
             pce.printStackTrace();
-        } catch (TransformerException tfe) {
-            tfe.printStackTrace();
         }
     }
 }
