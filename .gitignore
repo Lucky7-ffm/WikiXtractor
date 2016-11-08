@@ -52,7 +52,8 @@ fabric.properties
 .mtj.tmp/
 
 # Package Files #
-*.jar
+# reinclude .jar files because we share libraries in git, because we have no fancy build system
+#*.jar
 *.war
 *.ear
 
