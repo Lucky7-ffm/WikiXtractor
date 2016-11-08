@@ -11,6 +11,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -20,6 +22,8 @@ import org.w3c.dom.Element;
  */
 
 class PageExport {
+
+    private final static Logger logger = LogManager.getLogger(LinkExtractor.class);
 
     static void exportPages(Set<Page> pages){
 
@@ -48,7 +52,7 @@ class PageExport {
                 page.setAttributeNode(namespaceID);
 
                 Attr title = doc.createAttribute("title");
-                title.setValue(String.valueOf(currentPage.getTitle()));
+                title.setValue(currentPage.getTitle());
                 page.setAttributeNode(title);
 
                 // shorten way
@@ -84,10 +88,10 @@ class PageExport {
 
             transformer.transform(source, result);
 
-            System.out.println("File saved!");
+            logger.info("File saved");
 
-        } catch (ParserConfigurationException | TransformerException pce) {
-            pce.printStackTrace();
+        } catch (ParserConfigurationException | TransformerException e) {
+         logger.error("Error while writing xml output file", e);
         }
     }
 }
