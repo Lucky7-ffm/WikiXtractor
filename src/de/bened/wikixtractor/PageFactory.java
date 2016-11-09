@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by xuiqzy.
+ * @author xuiqzy
  */
 class PageFactory {
 

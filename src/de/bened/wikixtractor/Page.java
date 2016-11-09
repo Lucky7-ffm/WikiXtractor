@@ -3,7 +3,7 @@ package de.bened.wikixtractor;
 import java.util.Set;
 
 /**
- * Created by xuiqzy.
+ * @author xuiqzy
  */
 class Page {
     /**

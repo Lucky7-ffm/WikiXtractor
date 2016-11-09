@@ -11,8 +11,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 
-/** Created by Symdox
- *
+/**
+ * @author symdox
  */
 
 class LinkExtractor {

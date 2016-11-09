@@ -1,27 +1,44 @@
 package de.bened.wikixtractor;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
 
 /**
+ * @author xuiqzy
  * Handles user input on command line, calls extraction of pages and calls writing to xml file
  */
 class Main {
 
     /**
+     * logging object for this class
+     */
+    private final static Logger logger = LogManager.getLogger(Main.class);
+
+    /**
      * @param args first one is path to input file to be parsed, second one is output path to xml file to be created
      */
     public static void main(String[] args) {
-        // TODO convert program to use input and output file from arguments
-        Path testPath = Paths.get("/home/xuiqzy/wikipedia_de_prgpr_subset.txt");
+        if (args.length != 2) {
+            logger.error("Incorrect number of arguments: Please provide one path to the file to be parsed and one " +
+                    "path the output xml file should be written to!");
+        }
+
+        Path testPath = Paths.get(args[0]);
+        HashSet<Page> pages;
         try {
-            HashSet<Page> pages = PageFactory.extractPages(testPath);
-            PageExport.exportPages(pages);
+            pages = PageFactory.extractPages(testPath);
         } catch (IOException e) {
-            // already handled in PageFactory.extractPages(), but abort program now
+            // already handled in PageFactory.extractPages(), but abort program now and don't export anything
             return;
         }
+
+        File outputXmlFile = new File(args[1]);
+        PageExport.exportPages(pages, outputXmlFile);
     }
 }
