@@ -38,23 +38,21 @@ class PageExport {
      * @param fileToWriteTo the file where the output xml file should be written to
      */
     static void exportPages(Set<Page> pages, File fileToWriteTo){
-
         try {
-
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
-            // root elements
+            // root element
             Document doc = docBuilder.newDocument();
             Element rootElement = doc.createElement("pages");
             doc.appendChild(rootElement);
 
-            // page element
+            // page elements
             for(Page currentPage : pages) {
                 Element page = doc.createElement("page");
                 rootElement.appendChild(page);
 
-                // set attributes to page element
+                // set attributes for page element
                 Attr pageID = doc.createAttribute("pageID");
                 pageID.setValue(String.valueOf(currentPage.getPageID()));
                 page.setAttributeNode(pageID);
@@ -67,52 +65,34 @@ class PageExport {
                 title.setValue(currentPage.getTitle());
                 page.setAttributeNode(title);
 
-                // shorten way
-                // page.setAttribute("pageID", "value_pageID");
-
                 // categories element
                 Element categories = doc.createElement("categories");
                 page.appendChild(categories);
 
-                // category element
+                // category elements
                 for(String currentCategory : currentPage.getCategories()) {
                     Element category = doc.createElement("category");
                     categories.appendChild(category);
 
-                    // set attributes to category
+                    // set attributes in category
                     Attr name = doc.createAttribute("name");
                     name.setValue(currentCategory);
                     category.setAttributeNode(name);
                 }
-
-
-
             }
-
-            //write the content into xml file
 
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer serializer = transformerFactory.newTransformer();
 
-            //Setup indenting to "pretty print"
+            // Setup indenting for pretty output
             serializer.setOutputProperty(OutputKeys.INDENT, "yes");
-            serializer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+            serializer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+
+            // write the content into the xml file
             serializer.transform(new DOMSource(doc), new StreamResult(fileToWriteTo));
-
-            //TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            //Transformer transformer = transformerFactory.newTransformer();
-            //DOMSource source = new DOMSource(doc);
-            //StreamResult result = new StreamResult(fileToWriteTo);
-
-            // Output to console for testing
-            // StreamResult result = new StreamResult(System.out);
-
-            //transformer.transform(source, result);
-
             logger.info("File saved");
-
         } catch (ParserConfigurationException | TransformerException e) {
-         logger.error("Error while writing XML output file", e);
+         logger.error("Error while writing XML output file, check your specified output file", e);
         }
     }
 }

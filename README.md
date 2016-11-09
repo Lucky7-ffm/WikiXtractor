@@ -1,7 +1,7 @@
 #WikiXtractor
 
 **Run command:**
-java -Xmx2g -jar path/to/WikiXtractor.jar path/to/fileToParse.txt path/to/output.xml
+java -jar path/to/WikiXtractor.jar path/to/fileToParse.txt path/to/output.xml
 
 **Input file:**
 wikipedia_de_prgpr_subset.txt from any path.
