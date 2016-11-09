@@ -10,8 +10,11 @@ import java.nio.file.Paths;
 import java.util.HashSet;
 
 /**
- * @author xuiqzy
+ * <h1>Main</h1>
  * Handles user input on command line, calls extraction of pages and calls writing to xml file
+ *
+ * @author xuiqzy
+ * @since 07.11.2016
  */
 class Main {
 

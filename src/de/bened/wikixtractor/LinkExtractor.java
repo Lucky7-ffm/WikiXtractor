@@ -12,9 +12,13 @@ import org.jsoup.select.Elements;
 
 
 /**
- * @author symdox
+ * <h1>LinkExtractor</h1>
+ * The LinkExtractor class that returns the title from a <a href> Link
+ * after the div element catlinks in a HTML-Page.
+ *
+ * @author Symdox
+ * @since 07.11.2016
  */
-
 class LinkExtractor {
     /**
      * logging object for this class

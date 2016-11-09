@@ -19,9 +19,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
+ * <h1>PageExport</h1>
+ * Exports all page title and all category names into a xml file
+ *
  * @author doudou
+ * @since 07.11.2016
  */
-
 class PageExport {
 
     /**
