@@ -1,7 +1,6 @@
 package de.bened.wikixtractor;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -11,6 +10,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.OutputKeys;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,9 +19,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
+ * <h1>PageExport</h1>
+ * Exports all page title and all category names into a xml file
+ *
  * @author doudou
+ * @since 07.11.2016
  */
-
 class PageExport {
 
     /**
@@ -86,15 +89,25 @@ class PageExport {
             }
 
             // write the content into xml file
+
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            DOMSource source = new DOMSource(doc);
-            StreamResult result = new StreamResult(fileToWriteTo);
+            Transformer serializer;
+            serializer = transformerFactory.newTransformer();
+
+            //Setup indenting to "pretty print"
+            serializer.setOutputProperty(OutputKeys.INDENT, "yes");
+            serializer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+            serializer.transform(new DOMSource(doc), new StreamResult(fileToWriteTo));
+
+            //TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            //Transformer transformer = transformerFactory.newTransformer();
+            //DOMSource source = new DOMSource(doc);
+            //StreamResult result = new StreamResult(fileToWriteTo);
 
             // Output to console for testing
             // StreamResult result = new StreamResult(System.out);
 
-            transformer.transform(source, result);
+            //transformer.transform(source, result);
 
             logger.info("File saved");
 
