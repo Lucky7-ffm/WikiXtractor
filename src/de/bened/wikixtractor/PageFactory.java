@@ -13,7 +13,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * <h1>PageFactory</h1>
+ * Creates Page objects from a HTML file
+ *
  * @author xuiqzy
+ * @since 07.11.2016
  */
 class PageFactory {
 
