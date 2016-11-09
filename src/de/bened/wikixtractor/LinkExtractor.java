@@ -11,8 +11,13 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 
-/** Created by Symdox
+/**
+ * <h1>Linktext Extaction</h1>
+ * The LinkExtractor class that returns the title from a <a href> Link
+ * after the div element catlinks in a HTML-Page.
  *
+ * @author Symdox
+ * @since 07.11.2016
  */
 
 class LinkExtractor {

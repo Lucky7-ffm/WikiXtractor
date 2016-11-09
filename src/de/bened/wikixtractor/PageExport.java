@@ -18,7 +18,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Created by xuiqzy.
+ * <h1>PageExport</h1>
+ * Exports the page title and all category names from each Wikipedia article
+ *
+ * @author Doudou
+ * @since 07.11.2016
  */
 
 class PageExport {

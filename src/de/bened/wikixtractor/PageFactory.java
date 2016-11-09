@@ -13,8 +13,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by xuiqzy.
+ * <h1>PageFactory</h1>
+ * Extracts the Page object
+ *
+ * @author xuiqzy
+ * @since 07.11.2016
  */
+
 class PageFactory {
 
     /**
