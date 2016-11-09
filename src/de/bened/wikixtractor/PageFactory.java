@@ -14,7 +14,7 @@ import java.util.Set;
 
 /**
  * <h1>PageFactory</h1>
- * Creates Page objects from a HTML file
+ * Creates Page objects from an HTML file
  *
  * @author xuiqzy
  * @since 07.11.2016
@@ -107,7 +107,7 @@ class PageFactory {
 
             return pages;
         } catch (IOException e) {
-            logger.error("Couldn't access specified file" + e);
+            logger.error("Could not access specified file" + e);
             throw e;
         }
     }

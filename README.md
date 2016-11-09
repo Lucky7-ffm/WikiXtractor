@@ -1,13 +1,13 @@
 #WikiXtractor
 
 **Run command:**
-java -Xmx2g -jar <path>\WikiXtractor.jar <path>\input.txt <path>\output.txt
+java -Xmx2g -jar path/to/WikiXtractor.jar path/to/fileToParse.txt path/to/output.xml
 
 **Input file:**
 wikipedia_de_prgpr_subset.txt from any path.
 
 **Output file:**
-<filename>.txt or <filename>.xml to any path.
+\<filename>.txt or \<filename>.xml with any path.
 
 **Authors:**
 ### as doudou

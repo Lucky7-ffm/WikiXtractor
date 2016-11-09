@@ -23,6 +23,7 @@ import org.w3c.dom.Element;
  * Exports all page title and all category names into a xml file
  *
  * @author doudou
+ * @author symdox
  * @since 07.11.2016
  */
 class PageExport {
