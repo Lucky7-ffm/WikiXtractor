@@ -1,6 +1,7 @@
 package de.bened.wikixtractor;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -18,11 +19,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * <h1>PageExport</h1>
- * Exports the page title and all category names from each Wikipedia article
- *
- * @author Doudou
- * @since 07.11.2016
+ * @author doudou
  */
 
 class PageExport {
@@ -34,8 +31,9 @@ class PageExport {
 
     /**
      * @param pages pages to be written in the xml file
+     * @param fileToWriteTo the file where the output xml file should be written to
      */
-    static void exportPages(Set<Page> pages){
+    static void exportPages(Set<Page> pages, File fileToWriteTo){
 
         try {
 
@@ -91,7 +89,7 @@ class PageExport {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource source = new DOMSource(doc);
-            StreamResult result = new StreamResult(new File("file.xml"));
+            StreamResult result = new StreamResult(fileToWriteTo);
 
             // Output to console for testing
             // StreamResult result = new StreamResult(System.out);
@@ -101,7 +99,7 @@ class PageExport {
             logger.info("File saved");
 
         } catch (ParserConfigurationException | TransformerException e) {
-         logger.error("Error while writing xml output file", e);
+         logger.error("Error while writing XML output file", e);
         }
     }
 }

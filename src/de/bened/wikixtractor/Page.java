@@ -3,13 +3,8 @@ package de.bened.wikixtractor;
 import java.util.Set;
 
 /**
- * <h1>Page</h1>
- * Creates a new Page object
- *
  * @author xuiqzy
- * @since 07.11.2016
  */
-
 class Page {
     /**
      * id of the page
