@@ -89,11 +89,10 @@ class PageExport {
 
             }
 
-            // write the content into xml file
+            //write the content into xml file
 
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer serializer;
-            serializer = transformerFactory.newTransformer();
+            Transformer serializer = transformerFactory.newTransformer();
 
             //Setup indenting to "pretty print"
             serializer.setOutputProperty(OutputKeys.INDENT, "yes");
