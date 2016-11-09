@@ -23,8 +23,14 @@ import org.w3c.dom.Element;
 
 class PageExport {
 
+    /**
+     * logging object for this class
+     */
     private final static Logger logger = LogManager.getLogger(LinkExtractor.class);
 
+    /**
+     * @param pages pages to be written in the xml file
+     */
     static void exportPages(Set<Page> pages){
 
         try {

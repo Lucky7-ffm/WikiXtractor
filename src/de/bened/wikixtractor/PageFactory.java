@@ -17,9 +17,20 @@ import java.util.Set;
  */
 class PageFactory {
 
+    /**
+     * logging object for this class
+     */
     private final static Logger logger = LogManager.getLogger(LinkExtractor.class);
+    /**
+     * symbol on which pages are separated and on which page metadata header starts
+     */
     private final static String pageSplitSymbol = "¤";
 
+    /**
+     * @param path path to file to be parsed
+     * @return extracted Page objects with title, page id, namespace id and names of the categories it belongs to
+     * @throws IOException if file cannot be read
+     */
     static HashSet<Page> extractPages(Path path) throws IOException {
 
         Charset charset = StandardCharsets.UTF_8;

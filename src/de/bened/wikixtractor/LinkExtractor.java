@@ -16,8 +16,15 @@ import org.jsoup.select.Elements;
  */
 
 class LinkExtractor {
+    /**
+     * logging object for this class
+     */
     private final static Logger logger = LogManager.getLogger(LinkExtractor.class);
 
+    /**
+     * @param pageHTML valid HTML string to extract category names from
+     * @return names of categories
+     */
     static Set<String> extractLinks(String pageHTML) {
         Set<String> linkSet = new HashSet<>();
         Document doc = Jsoup.parse(pageHTML);
