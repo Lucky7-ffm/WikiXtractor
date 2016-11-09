@@ -5,7 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
 
-public class Main {
+class Main {
 
     public static void main(String[] args) {
         // TODO convert program to use input and output file from arguments
