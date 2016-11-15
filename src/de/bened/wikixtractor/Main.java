@@ -30,15 +30,16 @@ class Main {
         if (args.length != 2) {
             logger.error("Incorrect number of arguments: Please provide one path to the file to be parsed and one " +
                     "path the output xml file should be written to!");
+            System.exit(-1);
         }
 
         Path testPath = Paths.get(args[0]);
-        HashSet<Page> pages;
+        HashSet<Page> pages = new HashSet<>();
         try {
             pages = PageFactory.extractPages(testPath);
         } catch (IOException e) {
             // already handled in PageFactory.extractPages(), but abort program now and don't export anything
-            return;
+            System.exit(-1);
         }
 
         File outputXmlFile = new File(args[1]);
