@@ -17,6 +17,6 @@ wikipedia_de_prgpr_subset.txt from any path.
 **Editor:**
 - Main by xuiqzy
 - Page by xuiqzy
-- PageFactroy by xuiqzy
+- PageFactory by xuiqzy
 - LinkExtractor by symdox
 - PageExport by doudou and symdox
