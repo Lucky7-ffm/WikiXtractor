@@ -24,11 +24,11 @@ class PageFactory {
     /**
      * logging object for this class
      */
-    private final static Logger logger = LogManager.getLogger(LinkExtractor.class);
+    private final static Logger LOGGER = LogManager.getLogger(LinkExtractor.class);
     /**
      * symbol on which pages are separated and on which page metadata header starts
      */
-    private final static String pageSplitSymbol = "¤";
+    private final static String PAGE_SPLIT_SYMBOL = "¤";
 
     /**
      * @param path path to file to be parsed
@@ -56,10 +56,10 @@ class PageFactory {
 
             String currentLine;
             while ((currentLine = reader.readLine()) != null) {
-                if (currentLine.startsWith(pageSplitSymbol)) {
+                if (currentLine.startsWith(PAGE_SPLIT_SYMBOL)) {
                     // \t is the tab character
                     String[] splittedHeaderOfPage = currentLine.split("\t");
-                    if (splittedHeaderOfPage.length == 4 && splittedHeaderOfPage[0].equals(pageSplitSymbol)) {
+                    if (splittedHeaderOfPage.length == 4 && splittedHeaderOfPage[0].equals(PAGE_SPLIT_SYMBOL)) {
                         pageID = Integer.valueOf(splittedHeaderOfPage[1]);
                         namespaceID = Integer.valueOf(splittedHeaderOfPage[2]);
                         title = splittedHeaderOfPage[3];
@@ -67,7 +67,7 @@ class PageFactory {
                         // later only created when this header info is available, too
                         headerInfoParsed = true;
                         lineIsPartOfHtmlPage = true;
-                    } else if (splittedHeaderOfPage.length == 1 && splittedHeaderOfPage[0].equals(pageSplitSymbol)
+                    } else if (splittedHeaderOfPage.length == 1 && splittedHeaderOfPage[0].equals(PAGE_SPLIT_SYMBOL)
                             && lineIsPartOfHtmlPage && headerInfoParsed && !abortCurrentPageParsing) {
                         // this is the first line after </html> so don't append lines to the html string and stop it for
                         // the next lines, too
@@ -76,7 +76,7 @@ class PageFactory {
                         Set<String> categories = LinkExtractor.extractLinks(stringBuilder.toString());
 
                         pages.add(new Page(pageID, namespaceID, title, categories));
-                        logger.info("Page \"" + title + "\" added");
+                        LOGGER.info("Page \"" + title + "\" added");
 
                         // get ready for parsing next Page:
 
@@ -89,7 +89,7 @@ class PageFactory {
                         abortCurrentPageParsing = false;
 
                     } else { // invalid header
-                        logger.error("invalid header of page detected, ignoring this page");
+                        LOGGER.error("invalid header of page detected, ignoring this page");
                         // don't set lineIsPartOfHtmlPage to true so it won't read this page into a String and doesn't
                         // process it, set it to false to also abort any creation of pages which were interrupted by
                         // this invalid header (in that case it would be true at this moment)
@@ -99,7 +99,7 @@ class PageFactory {
                         headerInfoParsed = false;
 
                     }
-                    // everything needed is done now when pageSplitSymbol is detected, continues with the next line then
+                    // everything needed is done now when PAGE_SPLIT_SYMBOL is detected, continues with the next line then
                 } else if (lineIsPartOfHtmlPage) {
                     stringBuilder.append(currentLine);
                 }
@@ -107,7 +107,7 @@ class PageFactory {
 
             return pages;
         } catch (IOException e) {
-            logger.error("Could not access specified file" + e);
+            LOGGER.error("Could not access specified file" + e);
             throw e;
         }
     }

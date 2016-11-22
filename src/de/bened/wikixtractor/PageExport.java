@@ -31,7 +31,7 @@ class PageExport {
     /**
      * logging object for this class
      */
-    private final static Logger logger = LogManager.getLogger(LinkExtractor.class);
+    private final static Logger LOGGER = LogManager.getLogger(LinkExtractor.class);
 
     /**
      * @param pages pages to be written in the xml file
@@ -90,9 +90,9 @@ class PageExport {
 
             // write the content into the xml file
             serializer.transform(new DOMSource(doc), new StreamResult(fileToWriteTo));
-            logger.info("File saved");
+            LOGGER.info("File saved");
         } catch (ParserConfigurationException | TransformerException e) {
-         logger.error("Error while writing XML output file, check your specified output file", e);
+         LOGGER.error("Error while writing XML output file, check your specified output file", e);
         }
     }
 }

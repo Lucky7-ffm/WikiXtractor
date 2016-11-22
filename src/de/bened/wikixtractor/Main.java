@@ -21,14 +21,14 @@ class Main {
     /**
      * logging object for this class
      */
-    private final static Logger logger = LogManager.getLogger(Main.class);
+    private final static Logger LOGGER = LogManager.getLogger(Main.class);
 
     /**
      * @param args first one is path to input file to be parsed, second one is output path to xml file to be created
      */
     public static void main(String[] args) {
         if (args.length != 2) {
-            logger.error("Incorrect number of arguments: Please provide one path to the file to be parsed and one " +
+            LOGGER.error("Incorrect number of arguments: Please provide one path to the file to be parsed and one " +
                     "path the output xml file should be written to!");
             System.exit(-1);
         }

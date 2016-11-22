@@ -23,7 +23,7 @@ class LinkExtractor {
     /**
      * logging object for this class
      */
-    private final static Logger logger = LogManager.getLogger(LinkExtractor.class);
+    private final static Logger LOGGER = LogManager.getLogger(LinkExtractor.class);
 
     /**
      * @param pageHTML valid HTML string to extract category names from
@@ -39,7 +39,7 @@ class LinkExtractor {
         //Adds every link text from catlinks into a Set of Strings
         for (Element link : linkText) {
             linkSet.add(link.text());
-            logger.info("Successfully added " + link.text());
+            LOGGER.info("Successfully added " + link.text());
         }
 
         return linkSet;
