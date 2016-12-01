@@ -27,6 +27,9 @@ class Main {
      * @param args first one is path to input file to be parsed, second one is output path to xml file to be created
      */
     public static void main(String[] args) {
+
+        DatabaseManager.initialize();
+
         if (args.length != 2) {
             LOGGER.error("Incorrect number of arguments: Please provide one path to the file to be parsed and one " +
                     "path the output xml file should be written to!");
