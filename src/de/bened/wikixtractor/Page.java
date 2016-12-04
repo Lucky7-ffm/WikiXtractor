@@ -1,5 +1,8 @@
 package de.bened.wikixtractor;
 
+import org.neo4j.graphdb.Node;
+import org.neo4j.server.database.Database;
+
 import java.util.Set;
 
 /**
@@ -10,6 +13,8 @@ import java.util.Set;
  * @since 07.11.2016
  */
 class Page {
+
+    private final Node pageNode;
     /**
      * id of the page
      */
@@ -34,6 +39,7 @@ class Page {
      * @param categories titles of categories the page belongs to
      */
     Page(int pageID, int namespaceID, String title, Set<String> categories) {
+        //DatabaseManager.createPageNote(namespaceID, pageID, title, htmlContent)
         this.pageID = pageID;
         this.namespaceID = namespaceID;
         this.title = title;
