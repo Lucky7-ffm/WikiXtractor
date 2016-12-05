@@ -40,9 +40,9 @@ class DatabaseManager {
         try(Transaction tx = database.beginTx()){
             Node pageNode = database.createNode();
             pageNode.setProperty("Title", title);
-            pageNode.setProperty(("NamespaceID", namespaceID));
-            pageNode.setProperty(("PageID"), pageID);
-            pageNode.setProperty(("htmlContent"), htmlContent);
+            pageNode.setProperty("NamespaceID", namespaceID);
+            pageNode.setProperty("PageID", pageID);
+            pageNode.setProperty("htmlContent", htmlContent);
 
             return pageNode;
             }

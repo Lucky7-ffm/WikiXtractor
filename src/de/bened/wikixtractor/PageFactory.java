@@ -73,9 +73,10 @@ class PageFactory {
                         // the next lines, too
                         lineIsPartOfHtmlPage = false;
 
-                        Set<String> categories = LinkExtractor.extractLinks(stringBuilder.toString());
+                        String htmlContent = stringBuilder.toString();
+                        //Set<String> categories = LinkExtractor.extractLinks(stringBuilder.toString());
 
-                        pages.add(new Page(pageID, namespaceID, title, categories));
+                        pages.add(new Page(pageID, namespaceID, title, htmlContent));
                         LOGGER.info("Page \"" + title + "\" added");
 
                         // get ready for parsing next Page:

@@ -69,16 +69,16 @@ class PageExport {
                 Element categories = doc.createElement("categories");
                 page.appendChild(categories);
 
-                // category elements
-                for(String currentCategory : currentPage.getCategories()) {
-                    Element category = doc.createElement("category");
-                    categories.appendChild(category);
-
-                    // set attributes in category
-                    Attr name = doc.createAttribute("name");
-                    name.setValue(currentCategory);
-                    category.setAttributeNode(name);
-                }
+//                // category elements
+//                for(String currentCategory : currentPage.getCategories()) {
+//                    Element category = doc.createElement("category");
+//                    categories.appendChild(category);
+//
+//                    // set attributes in category
+//                    Attr name = doc.createAttribute("name");
+//                    name.setValue(currentCategory);
+//                    category.setAttributeNode(name);
+//                }
             }
 
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
