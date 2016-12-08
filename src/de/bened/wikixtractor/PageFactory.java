@@ -2,6 +2,11 @@ package de.bened.wikixtractor;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.neo4j.cypher.internal.ExecutionEngine;
+import org.neo4j.cypher.internal.ExecutionResult;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Label;
+import org.neo4j.graphdb.Result;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -45,6 +50,7 @@ class PageFactory {
             boolean headerInfoParsed = false;
             boolean abortCurrentPageParsing = false;
 
+            // builds html content
             StringBuilder stringBuilder = new StringBuilder();
 
             HashSet<Page> pages = new HashSet<>();
@@ -63,6 +69,9 @@ class PageFactory {
                         pageID = Integer.valueOf(splittedHeaderOfPage[1]);
                         namespaceID = Integer.valueOf(splittedHeaderOfPage[2]);
                         title = splittedHeaderOfPage[3];
+
+                        // TODO validate namespaceID to be either 0 or 14
+
                         // signals that header info like title, pageID, etc. was parsed so that page with categories is
                         // later only created when this header info is available, too
                         headerInfoParsed = true;
@@ -76,8 +85,14 @@ class PageFactory {
                         String htmlContent = stringBuilder.toString();
                         //Set<String> categories = LinkExtractor.extractLinks(stringBuilder.toString());
 
-                        pages.add(new Page(pageID, namespaceID, title, htmlContent));
-                        LOGGER.info("Page \"" + title + "\" added");
+                        Result result = DatabaseManager.getPageByPageIDAndNamespaceID(pageID, namespaceID);
+                        // no page with same pageID and same namespaceID/label found in database
+                        if(!result.hasNext()) {
+                           new Page(pageID, namespaceID, title, htmlContent);
+                            LOGGER.info("Page \"" + title + "\" added");
+                        } else {
+                            LOGGER.error("Page: \"" + title + "\" already exists in database!");
+                        }
 
                         // get ready for parsing next Page:
 

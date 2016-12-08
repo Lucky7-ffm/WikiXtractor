@@ -27,7 +27,6 @@ class Main {
      * @param args first one is path to input file to be parsed, second one is output path to xml file to be created
      */
     public static void main(String[] args) {
-
         DatabaseManager.initialize();
 
         if (args.length != 2) {

@@ -2,8 +2,6 @@ package de.bened.wikixtractor;
 
 import org.neo4j.graphdb.Node;
 
-import java.util.Set;
-
 /**
  * <h1>Page</h1>
  * Creates Page objects
@@ -14,30 +12,9 @@ import java.util.Set;
 class Page {
 
     private final Node pageNode;
-    /**
-     * id of the page
-     */
-    private final int pageID;
-    /**
-     * id of the namespace: 0 for an article, 14 for a category page
-     */
-    private final int namespaceID;
-    /**
-     * title of the page
-     */
-    private final String title;
 
-    /**
-     * @param pageID id of the page
-     * @param namespaceID namespace of the page: 0 for article, 14 for a category page
-     * @param title title of page
-     * @param htmlContent html content of the page
-     */
     Page(int pageID, int namespaceID, String title, String htmlContent) {
-        this.pageNode = DatabaseManager.createPageNote(namespaceID, pageID, title, htmlContent);
-        this.pageID = pageID;
-        this.namespaceID = namespaceID;
-        this.title = title;
+        this.pageNode = DatabaseManager.createPageNode(namespaceID, pageID, title, htmlContent);
     }
 
 
@@ -45,21 +22,21 @@ class Page {
      * @return id of the page
      */
     int getPageID() {
-        return pageID;
+        return (int) DatabaseManager.getPropertyFromNode(this.pageNode, "PageID");
     }
 
     /**
      * @return namespace of the page: 0 for an article, 14 for a category page
      */
     int getNamespaceID() {
-        return namespaceID;
+        return (int) DatabaseManager.getPropertyFromNode(this.pageNode, "NamespaceID");
     }
 
     /**
      * @return title of the page
      */
     String getTitle() {
-        return title;
+        return (String) DatabaseManager.getPropertyFromNode(this.pageNode, "Title");
     }
 
     /**
