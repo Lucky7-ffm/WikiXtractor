@@ -4,24 +4,34 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
+import org.neo4j.register.Register;
 
 import javax.xml.crypto.Data;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
 
 /**
- * Created by xuiqzy on 12/1/16.
+ * <h1>DatabaseManager</h1>
+ * Controls the NEO4J database
+ *
+ * @author xuiqzy, symodx
+ * @since 27.11.2016
  */
 class DatabaseManager {
 
-    final static private File databaseDirectory = new File("data");
+    static private File databaseDirectory = null;
 
     static private GraphDatabaseService database;
     final static private Logger LOGGER = LogManager.getLogger(DatabaseManager.class);
 
     static private Transaction transaction;
 
-    static void initialize() {
+    static void initialize(File path) {
+
+        setDatabaseDirectory(path);
+
         boolean isNewlyCreatedDatabase = true;
         if (databaseDirectory.exists()) {
             isNewlyCreatedDatabase = false;
@@ -40,12 +50,34 @@ class DatabaseManager {
                 database.schema().indexFor(Label.label("Category")).on("PageID").create();
                 database.schema().indexFor(Label.label("Category")).on("Title").create();
 
-                // TODO create indices for the labels and properties we need to query and traverse
-                //database.schema().indexFor(Label.label("Person")).on("name").create();
                 transaction.success();
             }
+
+            isDatabaseOnline();
         }
     }
+
+    static private void isDatabaseOnline() {
+        try (Transaction transaction = database.beginTx()) {
+            database.schema().awaitIndexesOnline(1, TimeUnit.DAYS);
+            transaction.success();
+        }
+
+    }
+
+    static void deleteDatabase(File path)
+    {
+        for (File file : path.listFiles())
+        {
+            if (file.isDirectory())
+                deleteDatabase(file);
+            else
+                if (!file.delete());
+        }
+        if (!path.delete());
+    }
+
+    static private void setDatabaseDirectory(File path) { databaseDirectory = path; }
 
     static void startTransaction() {
         DatabaseManager.transaction = DatabaseManager.database.beginTx();
@@ -99,6 +131,7 @@ class DatabaseManager {
 
     static Result getPageByPageIDAndNamespaceID(int pageID, int namespaceID) {
         Result result = null;
+
         if (namespaceID == 0) {
             Label articleLabel = Label.label("Article");
             result = database.execute("MATCH (node:" + articleLabel + ") WHERE node.PageID =" + pageID + " RETURN node");
@@ -106,6 +139,28 @@ class DatabaseManager {
             Label categoryLabel = Label.label("Category");
             result = database.execute("MATCH (node:" + categoryLabel + ") WHERE node.PageID =" + pageID + " RETURN node");
         }
+
         return result;
+    }
+
+    static Node searchForNamespaceIDAndTitle(int namespaceID, String title) {
+        try(Transaction transaction = database.beginTx()) {
+            Label label = null;
+            Node node = null;
+
+            if (namespaceID == 0) {
+                label = Label.label("Article");
+            }
+            else if (namespaceID == 14) {
+                label = Label.label("Category");
+            }
+            Iterator<Node> i = database.findNodes(label, "Title", title);
+
+            if (i.hasNext()) {
+                node = i.next();
+            }
+
+            return node;
+        }
     }
 }
