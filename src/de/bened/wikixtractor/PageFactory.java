@@ -98,6 +98,7 @@ class PageFactory {
 							LOGGER.info("Page \"" + title + "\" added");
 							if (numberOfPagesCreated >= maximumNumberOfPagesPerTransaction) {
 								DatabaseManager.endTransaction();
+								LOGGER.info(maximumNumberOfPagesPerTransaction + " Pages added in 1 transaction");
 								DatabaseManager.startTransaction();
 							}
 						} else {
