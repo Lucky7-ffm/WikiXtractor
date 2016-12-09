@@ -13,8 +13,8 @@ class Page {
 
 	private final Node pageNode;
 
-	Page(int pageID, int namespaceID, String title, String htmlContent) {
-		this.pageNode = DatabaseManager.createPageNode(namespaceID, pageID, title, htmlContent);
+	Page(Node nodeToPage) {
+		this.pageNode = nodeToPage;
 	}
 
 	/**

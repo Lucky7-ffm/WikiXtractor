@@ -2,6 +2,7 @@ package de.bened.wikixtractor;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Result;
 
 import java.io.BufferedReader;
@@ -30,6 +31,8 @@ class PageFactory {
 	 */
 	private final static String PAGE_SPLIT_SYMBOL = "¤";
 
+	private final static int maximumNumberOfPagesPerTransaction = 1000;
+
 	/**
 	 * @param pathToWikipediaFile path to file to be parsed
 	 * @return extracted Page objects with title, page id, namespace id and names of the categories it belongs to
@@ -53,6 +56,8 @@ class PageFactory {
 			int pageID = 0;
 			int namespaceID = 0;
 			String title = "";
+
+			int numberOfPagesCreated = 0;
 
 			String currentLine;
 
@@ -82,11 +87,16 @@ class PageFactory {
 						String htmlContent = stringBuilder.toString();
 						//Set<String> categories = LinkExtractor.extractLinks(stringBuilder.toString());
 
-						Result result = DatabaseManager.getPageByPageIDAndNamespaceID(pageID, namespaceID);
+						Node resultNode = DatabaseManager.getPageByPageIDAndNamespaceID(pageID, namespaceID);
 						// no page with same pageID and same namespaceID/label found in database
-						if (!result.hasNext()) {
-							new Page(pageID, namespaceID, title, htmlContent);
+						if (resultNode == null) {
+							DatabaseManager.createPageNode(namespaceID, pageID, title, htmlContent);
+							numberOfPagesCreated++;
 							LOGGER.info("Page \"" + title + "\" added");
+							if (numberOfPagesCreated >= maximumNumberOfPagesPerTransaction) {
+								DatabaseManager.endTransaction();
+								DatabaseManager.startTransaction();
+							}
 						} else {
 							LOGGER.error("Page: \"" + title + "\" already exists in database!");
 						}

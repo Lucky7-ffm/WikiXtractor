@@ -4,8 +4,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
+import org.neo4j.io.fs.FileUtils;
 
+import javax.xml.crypto.Data;
 import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
@@ -56,12 +59,11 @@ class DatabaseManager {
 	}
 
 	static void deleteDatabase(File path) {
-		for (File file : path.listFiles()) {
-			if (file.isDirectory())
-				deleteDatabase(file);
-			else if (!file.delete()) ;
+		if (path.exists()) try {
+			FileUtils.deleteRecursively(path);
+		} catch (IOException e) {
+			LOGGER.error("Can't delete old database", e);
 		}
-		if (!path.delete()) ;
 	}
 
 	static void startTransaction() {
@@ -97,11 +99,17 @@ class DatabaseManager {
 			pageNode.setProperty("PageID", pageID);
 			pageNode.setProperty("htmlContent", htmlContent);
 
-			transaction.success();
+			DatabaseManager.transaction.success();
 
 			return pageNode;
 		} catch (NotInTransactionException e) {
 			LOGGER.error("Tried to create a Node in the database without starting a transaction first", e);
+			throw e;
+		} catch (Exception e) {
+			// if anything other went wrong mark transaction as failed so it will be rolled back when closed
+			// even if success() is called afterwards, the whole transaction will still be rolled back
+			LOGGER.error("Error while creating Page in database, transaction will be rolled back", e);
+			DatabaseManager.transaction.failure();
 			throw e;
 		}
 	}
@@ -114,21 +122,27 @@ class DatabaseManager {
 		} catch (NotInTransactionException e) {
 			LOGGER.error("Tried to create a Node in the database without starting a transaction first", e);
 			throw e;
+		} catch (Exception e) {
+			// if anything other went wrong mark transaction as failed so it will be rolled back when closed
+			// even if success() is called afterwards, the whole transaction will still be rolled back
+			LOGGER.error("Error while creating Page in database, transaction will be rolled back", e);
+			DatabaseManager.transaction.failure();
+			throw e;
 		}
 	}
 
-	static Result getPageByPageIDAndNamespaceID(int pageID, int namespaceID) {
-		Result result = null;
+	static Node getPageByPageIDAndNamespaceID(int pageID, int namespaceID) {
+		Node resultNode = null;
 
 		if (namespaceID == 0) {
 			Label articleLabel = Label.label("Article");
-			result = database.execute("MATCH (node:" + articleLabel + ") WHERE node.PageID =" + pageID + " RETURN node");
-		} else if (namespaceID == 14) {
+			resultNode = DatabaseManager.database.findNode(articleLabel, "PageID", pageID);
+			} else if (namespaceID == 14) {
 			Label categoryLabel = Label.label("Category");
-			result = database.execute("MATCH (node:" + categoryLabel + ") WHERE node.PageID =" + pageID + " RETURN node");
-		}
+			resultNode = DatabaseManager.database.findNode(categoryLabel, "PageID", pageID);
+			}
 
-		return result;
+		return resultNode;
 	}
 
 	static Node searchForNamespaceIDAndTitle(int namespaceID, String title) {
