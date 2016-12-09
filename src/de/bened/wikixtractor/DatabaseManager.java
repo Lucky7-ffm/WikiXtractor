@@ -50,19 +50,12 @@ class DatabaseManager {
                 database.schema().indexFor(Label.label("Category")).on("PageID").create();
                 database.schema().indexFor(Label.label("Category")).on("Title").create();
 
+
+                database.schema().awaitIndexesOnline(1, TimeUnit.DAYS);
+
                 transaction.success();
             }
-
-            isDatabaseOnline();
         }
-    }
-
-    static private void isDatabaseOnline() {
-        try (Transaction transaction = database.beginTx()) {
-            database.schema().awaitIndexesOnline(1, TimeUnit.DAYS);
-            transaction.success();
-        }
-
     }
 
     static void deleteDatabase(File path)
