@@ -72,7 +72,7 @@ class PageFactory {
 						namespaceID = Integer.valueOf(splittedHeaderOfPage[2]);
 						title = splittedHeaderOfPage[3];
 
-						if (namespaceID != 0 && namespaceID != 0) {
+						if (namespaceID != 0 && namespaceID != 14) {
 							headerInfoParsed = false;
 							continue;
 						}
@@ -123,6 +123,7 @@ class PageFactory {
 						abortCurrentPageParsing = true;
 						// we don't want to use the parsed header info because the whole Page seems to be broken somehow
 						headerInfoParsed = false;
+						System.out.print(currentLine + "htmalline" + lineIsPartOfHtmlPage + "abort" + abortCurrentPageParsing + "headervalid" + headerInfoParsed);
 
 					}
 					// everything needed is done now when PAGE_SPLIT_SYMBOL is detected, continues with the next line then
