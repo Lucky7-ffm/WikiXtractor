@@ -68,7 +68,6 @@ class DatabaseManager {
 
 	static void startTransaction() {
 		if (DatabaseManager.transaction == null) {
-			System.out.print("blaaaa");
 			DatabaseManager.transaction = DatabaseManager.database.beginTx();
 		}
 	}
