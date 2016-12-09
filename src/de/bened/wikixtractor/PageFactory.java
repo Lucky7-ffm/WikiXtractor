@@ -72,10 +72,13 @@ class PageFactory {
 						namespaceID = Integer.valueOf(splittedHeaderOfPage[2]);
 						title = splittedHeaderOfPage[3];
 
-						// TODO validate namespaceID to be either 0 or 14
+						if (namespaceID != 0 && namespaceID != 0) {
+							headerInfoParsed = false;
+							continue;
+						}
 
-						// signals that header info like title, pageID, etc. was parsed so that page with categories is
-						// later only created when this header info is available, too
+						// signals that header info like title, pageID, etc. was parsed correctly so that page with
+						// categories is later only created when this header info is available, too
 						headerInfoParsed = true;
 						lineIsPartOfHtmlPage = true;
 					} else if (splittedHeaderOfPage.length == 1 && splittedHeaderOfPage[0].equals(PAGE_SPLIT_SYMBOL)
