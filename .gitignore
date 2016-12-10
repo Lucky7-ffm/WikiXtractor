@@ -60,3 +60,11 @@ fabric.properties
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
+# our wikipedia input file
+wikipedia_de_prgpr_subset.txt
+# the xml output file with the parsed info
+output.xml
+# the log file
+app.log
+# database directory for neo4j
+data/
