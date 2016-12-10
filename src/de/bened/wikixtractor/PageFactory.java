@@ -96,9 +96,11 @@ class PageFactory {
 							DatabaseManager.createPageNode(namespaceID, pageID, title, htmlContent);
 							numberOfPagesCreated++;
 							LOGGER.info("Page \"" + title + "\" added");
-							if (numberOfPagesCreated >= maximumNumberOfPagesPerTransaction) {
+							// start a new transaction every maximumNumberOfPagesPerTransaction Pages so one transaction
+							// doesn't get too big, heap size seems to limit here, too
+							if ((numberOfPagesCreated % maximumNumberOfPagesPerTransaction) == 0) {
 								DatabaseManager.endTransaction();
-								LOGGER.info(maximumNumberOfPagesPerTransaction + " Pages added in 1 transaction");
+								LOGGER.info(maximumNumberOfPagesPerTransaction + " Pages added in a transaction");
 								DatabaseManager.startTransaction();
 							}
 						} else {

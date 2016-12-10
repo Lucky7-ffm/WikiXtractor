@@ -6,7 +6,6 @@ import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.io.fs.FileUtils;
 
-import javax.xml.crypto.Data;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
@@ -39,9 +38,9 @@ class DatabaseManager {
 		// create or reopen database
 		DatabaseManager.database = new GraphDatabaseFactory().newEmbeddedDatabase(databaseDirectory);
 
-		// index properties of labels for quicker queries and traversal after database is first created
-		if (isNewlyCreatedDatabase) {
-			try (Transaction transaction = database.beginTx()) {
+		try (Transaction transaction = database.beginTx()) {
+			// index properties of labels for quicker queries and traversal after database is first created
+			if (isNewlyCreatedDatabase) {
 				database.schema().indexFor(Label.label("Article")).on("NamespaceID").create();
 				database.schema().indexFor(Label.label("Article")).on("PageID").create();
 				database.schema().indexFor(Label.label("Article")).on("Title").create();
@@ -49,12 +48,11 @@ class DatabaseManager {
 				database.schema().indexFor(Label.label("Category")).on("NamespaceID").create();
 				database.schema().indexFor(Label.label("Category")).on("PageID").create();
 				database.schema().indexFor(Label.label("Category")).on("Title").create();
-
-
-				database.schema().awaitIndexesOnline(1, TimeUnit.DAYS);
-
-				transaction.success();
 			}
+			// always wait for indices to become online
+			database.schema().awaitIndexesOnline(1, TimeUnit.DAYS);
+
+			transaction.success();
 		}
 	}
 

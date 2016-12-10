@@ -30,22 +30,27 @@ class Main {
 
 		if (args.length == 2) {
 
-			if (args[0].equals("reset")) {
-				File pathToDatabaseDirectory = new File(args[1]);
-				try {
-					DatabaseManager.deleteDatabase(pathToDatabaseDirectory);
-					LOGGER.info("Successfully droped database.");
-					DatabaseManager.initialize(pathToDatabaseDirectory);
-					LOGGER.info("Successfully created a new database.");
-				} catch (Exception e) {
-					LOGGER.error("No database found. Try another path.");
-				}
-			} else if (args[0].equals("categorylinks")) {
-				// TODO create categorylinks function
-			} else if (args[0].equals("articlelinks")) {
-				// TODO create articlelinks function
-			} else {
-				argumentFail();
+			switch (args[0]) {
+				case "reset":
+					File pathToDatabaseDirectory = new File(args[1]);
+					try {
+						DatabaseManager.deleteDatabase(pathToDatabaseDirectory);
+						LOGGER.info("Successfully dropped database.");
+						DatabaseManager.initialize(pathToDatabaseDirectory);
+						LOGGER.info("Successfully created a new database.");
+					} catch (Exception e) {
+						LOGGER.error("No database found. Try another path.");
+					}
+					break;
+				case "categorylinks":
+					// TODO create categorylinks function
+					break;
+				case "articlelinks":
+					// TODO create articlelinks function
+					break;
+				default:
+					argumentFail();
+					break;
 			}
 		} else if (args.length == 3) {
 
