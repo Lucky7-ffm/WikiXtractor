@@ -2,6 +2,7 @@ package de.bened.wikixtractor;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 
 import java.util.Set;
@@ -11,6 +12,7 @@ import java.util.Set;
  * Creates Page objects
  *
  * @author xuiqzy
+ * @author doudou
  * @since 07.11.2016
  */
 class Page {
@@ -31,28 +33,32 @@ class Page {
 
 	void addCategory(Page category) {
 		DatabaseManager.createRelationship(this.pageNode, category.pageNode,
-				DatabaseManager.RelationshipTypes.hasCategory);
+				DatabaseManager.PageRelationshipType.hasCategory);
 	}
 
 	void addLinkToArticle(Page article) {
 		DatabaseManager.createRelationship(this.pageNode, article.pageNode,
-				DatabaseManager.RelationshipTypes.linksTo);
+				DatabaseManager.PageRelationshipType.linksTo);
 	}
 
 	Set<Page> getDirectCategories() {
-		return null;
+		return DatabaseManager.getEndNodesOfRelationship(this, DatabaseManager.PageRelationshipType.hasCategory,
+				Direction.OUTGOING, false);
 	}
 
 	Set<Page> getDirectAndIndirectCategories() {
-		return null;
+		return DatabaseManager.getEndNodesOfRelationship(this, DatabaseManager.PageRelationshipType.hasCategory,
+				Direction.OUTGOING, true);
 	}
 
 	Set<Page> getLinkedToArticles() {
-		return null;
+		return DatabaseManager.getEndNodesOfRelationship(this, DatabaseManager.PageRelationshipType.linksTo,
+				Direction.OUTGOING, false);
 	}
 
 	Set<Page> getLinkedFromArticles() {
-		return null;
+		return DatabaseManager.getEndNodesOfRelationship(this, DatabaseManager.PageRelationshipType.linksTo,
+				Direction.INCOMING, false);
 	}
 
 	/**
@@ -81,6 +87,10 @@ class Page {
 	 */
 	String getHtmlContent() {
 		return (String) DatabaseManager.getPropertyFromNode(this.pageNode, "HtmlContent");
+	}
+
+	Node getPageNode() {
+		return this.pageNode;
 	}
 
 	@Override

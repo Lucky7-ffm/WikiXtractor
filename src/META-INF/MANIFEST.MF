@@ -1,3 +1,32 @@
 Manifest-Version: 1.0
+Class-Path: jsoup-1.10.1.jar asm-5.0.2.jar bcpkix-jdk15on-1.53.jar bcp
+ rov-jdk15on-1.53.jar commons-beanutils-1.8.3.jar commons-configuratio
+ n-1.10.jar commons-digester-2.1.jar commons-io-2.4.jar commons-lang-2
+ .6.jar commons-lang3-3.3.2.jar commons-logging-1.1.1.jar concurrentli
+ nkedhashmap-lru-1.4.2.jar jackson-core-asl-1.9.13.jar jackson-jaxrs-1
+ .9.13.jar jackson-mapper-asl-1.9.13.jar javax.servlet-api-3.1.0.jar j
+ ersey-core-1.19.jar jersey-multipart-1.19.jar jersey-server-1.19.jar 
+ jersey-servlet-1.19.jar jetty-http-9.2.9.v20150224.jar jetty-io-9.2.9
+ .v20150224.jar jetty-security-9.2.9.v20150224.jar jetty-server-9.2.9.
+ v20150224.jar jetty-servlet-9.2.9.v20150224.jar jetty-util-9.2.9.v201
+ 50224.jar jetty-webapp-9.2.9.v20150224.jar jetty-xml-9.2.9.v20150224.
+ jar jline-2.12.jar jsr311-api-1.1.2.r612.jar lucene-analyzers-common-
+ 5.5.0.jar lucene-codecs-5.5.0.jar lucene-core-5.5.0.jar lucene-queryp
+ arser-5.5.0.jar mimepull-1.9.3.jar neo4j-bolt-3.0.7.jar neo4j-codegen
+ -3.0.7.jar neo4j-collections-3.0.7.jar neo4j-command-line-3.0.7.jar n
+ eo4j-common-3.0.7.jar neo4j-consistency-check-3.0.7.jar neo4j-csv-3.0
+ .7.jar neo4j-cypher-3.0.7.jar neo4j-cypher-compiler-2.3-2.3.7.jar neo
+ 4j-cypher-compiler-3.0-3.0.7.jar neo4j-cypher-frontend-2.3-2.3.7.jar 
+ neo4j-cypher-frontend-3.0-3.0.7.jar neo4j-dbms-3.0.7.jar neo4j-graph-
+ algo-3.0.7.jar neo4j-graph-matching-3.0.7.jar neo4j-graphdb-api-3.0.7
+ .jar neo4j-import-tool-3.0.7.jar neo4j-io-3.0.7.jar neo4j-jmx-3.0.7.j
+ ar neo4j-kernel-3.0.7.jar neo4j-logging-3.0.7.jar neo4j-lucene-index-
+ 3.0.7.jar neo4j-lucene-upgrade-3.0.7.jar neo4j-primitive-collections-
+ 3.0.7.jar neo4j-resource-3.0.7.jar neo4j-security-3.0.7.jar neo4j-ser
+ ver-3.0.7.jar neo4j-shell-3.0.7.jar neo4j-udc-3.0.7.jar neo4j-unsafe-
+ 3.0.7.jar netty-all-4.0.28.Final.jar opencsv-2.3.jar parboiled-core-1
+ .1.7.jar parboiled-scala_2.11-1.1.7.jar rhino-1.7R4.jar scala-library
+ -2.11.8.jar scala-reflect-2.11.8.jar server-api-3.0.7.jar log4j-api-2
+ .7.jar log4j-core-2.7.jar
 Main-Class: de.bened.wikixtractor.Main
 

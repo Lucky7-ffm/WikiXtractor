@@ -8,9 +8,7 @@ import org.neo4j.io.fs.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -30,7 +28,7 @@ class DatabaseManager {
 
 	private static Transaction transaction = null;
 
-	enum RelationshipTypes implements RelationshipType {hasCategory, linksTo}
+	enum PageRelationshipType implements org.neo4j.graphdb.RelationshipType {hasCategory, linksTo}
 
 	static void initialize(File databaseDirectory) {
 
@@ -61,27 +59,41 @@ class DatabaseManager {
 				database.schema().indexFor(Label.label("Category")).on("PageID").create();
 				database.schema().indexFor(Label.label("Category")).on("Title").create();
 			}
-			// always wait for indices to become online
+
+			LOGGER.info("Successfully created all indices on database.");
+			transaction.success();
+		} catch (Exception e) {
+			LOGGER.error("Error while creating indices, transaction will be rolled back!", e);
+			throw e;
+		}
+
+		// always wait for indices to become online
+		waitForIndices();
+	}
+
+	private static void waitForIndices() {
+		try (Transaction transaction = database.beginTx()) {
 			database.schema().awaitIndexesOnline(15, TimeUnit.SECONDS);
 
-			LOGGER.info("Successfully initialized database.");
-
+			LOGGER.info("Successfully waited for indices to become online.");
 			transaction.success();
-
 		} catch (Exception e) {
-			LOGGER.error("Error while creating indices and waiting for them to come online, " +
-					"transaction will be rolled back", e);
+			LOGGER.error("Error while waiting for indices of database to come online," +
+					"transaction will be rolled back!", e);
 			throw e;
 		}
 	}
 
-	static void deleteDatabase(File databaseDirectory) throws IOException {
-		if (databaseDirectory.exists()) try {
-			FileUtils.deleteRecursively(databaseDirectory);
-			LOGGER.info("Successfully dropped database.");
-		} catch (IOException e) {
-			LOGGER.error("Can't delete old database", e);
-			throw e;
+	static void deleteDatabase(File databaseDirectory) {
+		if (databaseDirectory.exists()) {
+			try {
+				FileUtils.deleteRecursively(databaseDirectory);
+				LOGGER.info("Successfully dropped database.");
+			} catch (IOException e) {
+				LOGGER.error("Database directory exists, but can't delete it!", e);
+			}
+		} else {
+			LOGGER.error("Database directory doesn't exist!");
 		}
 	}
 
@@ -142,12 +154,12 @@ class DatabaseManager {
 			// if anything went wrong the transaction in this method will fail and either it or a transaction
 			// containing it will be rolled back even if success() is called afterwards for this or the containing
 			// transaction
-			LOGGER.error("Error while creating page node in database, transaction will be rolled back", e);
+			LOGGER.error("Error while creating page node in database, transaction will be rolled back!", e);
 			throw e;
 		}
 	}
 
-	static void createRelationship(Node startNode, Node endNode, RelationshipType relationshipType) {
+	static void createRelationship(Node startNode, Node endNode, org.neo4j.graphdb.RelationshipType relationshipType) {
 		try (Transaction transaction = DatabaseManager.database.beginTx()) {
 			startNode.createRelationshipTo(endNode, relationshipType);
 
@@ -156,7 +168,7 @@ class DatabaseManager {
 			// if anything went wrong the transaction in this method will fail and either it or a transaction
 			// containing it will be rolled back even if success() is called afterwards for this or the containing
 			// transaction
-			LOGGER.error("Error while creating Page in database, transaction will be rolled back", e);
+			LOGGER.error("Error while creating Page in database, transaction will be rolled back!", e);
 			throw e;
 		}
 	}
@@ -170,7 +182,7 @@ class DatabaseManager {
 			// if anything went wrong the transaction in this method will fail and either it or a transaction
 			// containing it will be rolled back even if success() is called afterwards for this or the containing
 			// transaction
-			LOGGER.error("Error while getting property from node in database, transaction will be rolled back",
+			LOGGER.error("Error while getting property from node in database, transaction will be rolled back!",
 					e);
 			throw e;
 		}
@@ -193,7 +205,7 @@ class DatabaseManager {
 			// containing it will be rolled back even if success() is called afterwards for this or the containing
 			// transaction
 			LOGGER.error("Error while searching for Page by PageID and NamespaceID in database, transaction" +
-					"will be rolled back", e);
+					"will be rolled back!", e);
 			throw e;
 		}
 
@@ -216,7 +228,7 @@ class DatabaseManager {
 			// if anything went wrong the transaction in this method will fail and either it or a transaction
 			// containing it will be rolled back even if success() is called afterwards for this or the containing
 			// transaction
-			LOGGER.error("Error while getting all article pages, transaction will be rolled back", e);
+			LOGGER.error("Error while getting all article pages, transaction will be rolled back!", e);
 			throw e;
 		}
 		return allArticlePages;
@@ -237,8 +249,8 @@ class DatabaseManager {
 				try {
 					allPages.add(new Page(currentNode));
 				} catch (IllegalArgumentException e) {
-					LOGGER.error("Creating Page with empty node failed, ResourceIterator shouldn't contain empty" +
-							"nodes");
+					LOGGER.error("Creating Page with empty node failed, ResourceIterator shouldn't contain empty nodes!",
+							e);
 				}
 			}
 			transaction.success();
@@ -247,7 +259,7 @@ class DatabaseManager {
 			// if anything went wrong the transaction in this method will fail and either it or a transaction
 			// containing it will be rolled back even if success() is called afterwards for this or the containing
 			// transaction
-			LOGGER.error("Error while getting all pages, transaction will be rolled back", e);
+			LOGGER.error("Error while getting all pages, transaction will be rolled back!", e);
 			throw e;
 		}
 	}
@@ -260,8 +272,7 @@ class DatabaseManager {
 			try {
 				result.add(new Page(currentNode));
 			} catch (IllegalArgumentException e) {
-				LOGGER.error("Creating Page with empty node failed, ResourceIterator shouldn't contain empty" +
-						"nodes");
+				LOGGER.error("Creating Page with empty node failed, ResourceIterator shouldn't contain empty nodes!", e);
 			}
 		}
 		return result;
@@ -291,7 +302,45 @@ class DatabaseManager {
 		}
 	}
 
-	static Map<String, String> getPageInfoByNamespaceIDAndTitle() {
-		return null;
+
+	static Set<Page> getEndNodesOfRelationship(Page startPage, PageRelationshipType pageRelationshipType, Direction direction,
+											   boolean recursive) {
+		return getEndNodesOfRelationshipHelper(startPage, pageRelationshipType, direction, recursive, new HashSet<>());
+	}
+
+	private static Set<Page> getEndNodesOfRelationshipHelper(Page startPage, PageRelationshipType pageRelationshipType, Direction direction,
+															 boolean recursive, Set<Page> endNodePages) {
+
+		try (Transaction transaction = database.beginTx()) {
+
+			for (Relationship relationship : startPage.getPageNode().getRelationships(pageRelationshipType, direction)) {
+				try {
+					Page endNodePage;
+					if (direction == Direction.OUTGOING) {
+						endNodePage = new Page(relationship.getEndNode());
+					} else {
+						endNodePage = new Page(relationship.getStartNode());
+					}
+					if (!endNodePages.contains(endNodePage)) {
+						endNodePages.add(endNodePage);
+						if (recursive) {
+							endNodePages.addAll(getEndNodesOfRelationshipHelper(endNodePage, pageRelationshipType, direction,
+									true, endNodePages));
+						}
+					}
+				} catch (IllegalArgumentException e) {
+					LOGGER.error("Creating Page with empty node failed, relationship shouldn't contain empty nodes!", e);
+				}
+			}
+			transaction.success();
+			return endNodePages;
+		} catch (Exception e) {
+			// if anything went wrong the transaction in this method will fail and either it or a transaction
+			// containing it will be rolled back even if success() is called afterwards for this or the containing
+			// transaction
+			LOGGER.error("Error while getting end nodes of a relationship, transaction will be rolled back!",
+					e);
+			throw e;
+		}
 	}
 }

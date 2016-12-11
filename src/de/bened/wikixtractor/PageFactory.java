@@ -150,7 +150,7 @@ class PageFactory {
 			DatabaseManager.markTransactionSuccessful();
 			DatabaseManager.endTransaction();
 		} catch (IOException e) {
-			LOGGER.error("Could not access specified file" + e);
+			LOGGER.error("Could not access the specified input file to parse!" + e);
 			throw e;
 		}
 	}
