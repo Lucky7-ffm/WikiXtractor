@@ -304,17 +304,35 @@ class DatabaseManager {
 	}
 
 
-	static Set<Page> getEndNodesOfRelationship(Page startPage, PageRelationshipType pageRelationshipType, Direction direction,
-											   boolean recursive) {
+	/**
+	 * @param startPage            start point of graph traversal
+	 * @param pageRelationshipType either hasCategory or linksTo of enum type PageRelationshipType
+	 * @param direction            incoming if connection to another page is queried and outgoing if connections to this page is
+	 *                             queried
+	 * @param recursive            false if only direct connections are needed, true if the same traversal should be done for all
+	 *                             resulting pages until no new page is found
+	 * @return all pages that are connected to this page (recursively) according to the parameters
+	 */
+	static Set<Page> getEndNodesOfRelationship(Page startPage, PageRelationshipType pageRelationshipType,
+											   Direction direction, boolean recursive) {
 		return getEndNodesOfRelationshipHelper(startPage, pageRelationshipType, direction, recursive, new HashSet<>());
 	}
 
-	private static Set<Page> getEndNodesOfRelationshipHelper(Page startPage, PageRelationshipType pageRelationshipType, Direction direction,
-															 boolean recursive, Set<Page> endNodePages) {
+
+	/**
+	 * Helper with the same parameters as the non-private real method plus the current Set of Pages that were found.
+	 * This way we can stop adding the page to the set and calling the function recursively, if we already discovered
+	 * the page, therefore avoiding to follow loops in the graph.
+	 */
+	private static Set<Page> getEndNodesOfRelationshipHelper(Page startPage, PageRelationshipType pageRelationshipType,
+															 Direction direction, boolean recursive,
+															 Set<Page> endNodePages) {
 
 		try (Transaction transaction = database.beginTx()) {
 
-			for (Relationship relationship : startPage.getPageNode().getRelationships(pageRelationshipType, direction)) {
+			Node startNode = startPage.getPageNode();
+
+			for (Relationship relationship : startNode.getRelationships(pageRelationshipType, direction)) {
 				try {
 					Page endNodePage;
 					if (direction == Direction.OUTGOING) {
@@ -325,12 +343,13 @@ class DatabaseManager {
 					if (!endNodePages.contains(endNodePage)) {
 						endNodePages.add(endNodePage);
 						if (recursive) {
-							endNodePages.addAll(getEndNodesOfRelationshipHelper(endNodePage, pageRelationshipType, direction,
-									true, endNodePages));
+							endNodePages.addAll(getEndNodesOfRelationshipHelper(endNodePage, pageRelationshipType,
+									direction, true, endNodePages));
 						}
 					}
 				} catch (IllegalArgumentException e) {
-					LOGGER.error("Creating Page with empty node failed, relationship shouldn't contain empty nodes!", e);
+					LOGGER.error("Creating Page with empty node failed, relationship shouldn't contain" +
+							"empty nodes!", e);
 				}
 			}
 			transaction.success();
