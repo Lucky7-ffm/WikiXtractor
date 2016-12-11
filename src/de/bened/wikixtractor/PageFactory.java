@@ -2,8 +2,6 @@ package de.bened.wikixtractor;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Result;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,7 +9,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashSet;
 
 /**
  * <h1>PageFactory</h1>
@@ -35,10 +32,9 @@ class PageFactory {
 
 	/**
 	 * @param pathToWikipediaFile path to file to be parsed
-	 * @return extracted Page objects with title, page id, namespace id and names of the categories it belongs to
 	 * @throws IOException if file cannot be read
 	 */
-	static HashSet<Page> extractPages(Path pathToWikipediaFile) throws IOException {
+	static void extractPages(Path pathToWikipediaFile) throws IOException {
 
 		Charset charset = StandardCharsets.UTF_8;
 		try (BufferedReader reader = Files.newBufferedReader(pathToWikipediaFile, charset)) {
@@ -51,13 +47,12 @@ class PageFactory {
 			// builds html content
 			StringBuilder stringBuilder = new StringBuilder();
 
-			HashSet<Page> pages = new HashSet<>();
-
 			int pageID = 0;
 			int namespaceID = 0;
 			String title = "";
 
-			int numberOfPagesCreated = 0;
+			int numberOfPagesParsed = 0;
+			boolean errorInCurrentTransaction = false;
 
 			String currentLine;
 
@@ -88,19 +83,35 @@ class PageFactory {
 						lineIsPartOfHtmlPage = false;
 
 						String htmlContent = stringBuilder.toString();
-						//Set<String> categories = LinkExtractor.extractLinks(stringBuilder.toString());
+						//Set<String> categories = LinkExtractor.extractCategoryTitlesFromHtmlString(stringBuilder.toString());
 
-						Node resultNode = DatabaseManager.getPageByPageIDAndNamespaceID(pageID, namespaceID);
+						Page potentialExistingPage = DatabaseManager.getPageByPageIDAndNamespaceID(pageID, namespaceID);
 						// no page with same pageID and same namespaceID/label found in database
-						if (resultNode == null) {
-							DatabaseManager.createPageNode(namespaceID, pageID, title, htmlContent);
-							numberOfPagesCreated++;
-							LOGGER.info("Page \"" + title + "\" added");
+						if (potentialExistingPage == null) {
+							try {
+								DatabaseManager.createPageNode(namespaceID, pageID, title, htmlContent);
+								LOGGER.info("Page \"" + title + "\" added");
+							} catch (Exception e) {
+								LOGGER.error("Creation of page node failed, current transaction with up to " +
+										maximumNumberOfPagesPerTransaction + " new Pages will be rolled back");
+								errorInCurrentTransaction = true;
+							}
+							numberOfPagesParsed++;
+
 							// start a new transaction every maximumNumberOfPagesPerTransaction Pages so one transaction
 							// doesn't get too big, heap size seems to limit here, too
-							if ((numberOfPagesCreated % maximumNumberOfPagesPerTransaction) == 0) {
+							if ((numberOfPagesParsed % maximumNumberOfPagesPerTransaction) == 0) {
+								// if creation of a node failed previously, this statement has no effect and the whole transaction will be
+								// rolled back regardless
+								DatabaseManager.markTransactionSuccessful();
+
 								DatabaseManager.endTransaction();
-								LOGGER.info(maximumNumberOfPagesPerTransaction + " Pages added in a transaction");
+								if (!errorInCurrentTransaction) {
+									LOGGER.info("Pages " +
+											(numberOfPagesParsed - maximumNumberOfPagesPerTransaction + 1) +
+											" - " + numberOfPagesParsed + " added in a transaction");
+								}
+								errorInCurrentTransaction = false;
 								DatabaseManager.startTransaction();
 							}
 						} else {
@@ -126,18 +137,16 @@ class PageFactory {
 						abortCurrentPageParsing = true;
 						// we don't want to use the parsed header info because the whole Page seems to be broken somehow
 						headerInfoParsed = false;
-						System.out.print(currentLine + "htmalline" + lineIsPartOfHtmlPage + "abort" + abortCurrentPageParsing + "headervalid" + headerInfoParsed);
-
 					}
 					// everything needed is done now when PAGE_SPLIT_SYMBOL is detected, continues with the next line then
 				} else if (lineIsPartOfHtmlPage) {
 					stringBuilder.append(currentLine);
 				}
 			}
-
+			// if creation of a node failed previously, this statement has no effect and the whole transaction will be
+			// rolled back regardless
+			DatabaseManager.markTransactionSuccessful();
 			DatabaseManager.endTransaction();
-
-			return pages;
 		} catch (IOException e) {
 			LOGGER.error("Could not access specified file" + e);
 			throw e;

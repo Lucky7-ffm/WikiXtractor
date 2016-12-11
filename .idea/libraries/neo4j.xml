@@ -75,6 +75,9 @@
       <root url="jar://$PROJECT_DIR$/libraries/neo4j/server-api-3.0.7.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/libraries/neo4j/neo4j-graphdb-api-3.0.7-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libraries/neo4j/neo4j-kernel-3.0.7-sources.jar!/" />
+    </SOURCES>
   </library>
 </component>

@@ -8,35 +8,41 @@ import org.neo4j.io.fs.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
  * <h1>DatabaseManager</h1>
  * Controls the NEO4J database
  *
- * @author xuiqzy, symodx
+ * @author xuiqzy
+ * @author symdox
  * @since 27.11.2016
  */
 class DatabaseManager {
 
-	static private File databaseDirectory = null;
+	private static File databaseDirectory = null;
 
-	static private GraphDatabaseService database;
-	final static private Logger LOGGER = LogManager.getLogger(DatabaseManager.class);
+	private static GraphDatabaseService database;
+	private static final Logger LOGGER = LogManager.getLogger(DatabaseManager.class);
 
-	static private Transaction transaction = null;
+	private static Transaction transaction = null;
 
-	static void initialize(File pathToDatabaseDirectory) {
+	enum RelationshipTypes implements RelationshipType {hasCategory, linksTo}
 
-		DatabaseManager.databaseDirectory = pathToDatabaseDirectory;
+	static void initialize(File databaseDirectory) {
+
+		DatabaseManager.databaseDirectory = databaseDirectory;
 
 		boolean isNewlyCreatedDatabase = true;
-		if (databaseDirectory.exists()) {
+		if (DatabaseManager.databaseDirectory.exists()) {
 			isNewlyCreatedDatabase = false;
 		}
+
 		// create or reopen database
-		DatabaseManager.database = new GraphDatabaseFactory().newEmbeddedDatabase(databaseDirectory);
+		DatabaseManager.database = new GraphDatabaseFactory().newEmbeddedDatabase(DatabaseManager.databaseDirectory);
 
 		try (Transaction transaction = database.beginTx()) {
 			// index properties of labels for quicker queries and traversal after database is first created
@@ -50,17 +56,23 @@ class DatabaseManager {
 				database.schema().indexFor(Label.label("Category")).on("Title").create();
 			}
 			// always wait for indices to become online
-			database.schema().awaitIndexesOnline(1, TimeUnit.DAYS);
+			database.schema().awaitIndexesOnline(15, TimeUnit.SECONDS);
 
 			transaction.success();
+
+		} catch (Exception e) {
+			LOGGER.error("Error while creating indices and waiting for them to come online, " +
+					"transaction will be rolled back", e);
+			throw e;
 		}
 	}
 
-	static void deleteDatabase(File path) {
-		if (path.exists()) try {
-			FileUtils.deleteRecursively(path);
+	static void deleteDatabase(File databaseDirectory) throws IOException {
+		if (databaseDirectory.exists()) try {
+			FileUtils.deleteRecursively(databaseDirectory);
 		} catch (IOException e) {
 			LOGGER.error("Can't delete old database", e);
+			throw e;
 		}
 	}
 
@@ -70,9 +82,26 @@ class DatabaseManager {
 		}
 	}
 
+	static void markTransactionSuccessful() {
+		// if creation of a node failed previously, this statement has no effect and the whole transaction will be
+		// rolled back regardless
+		DatabaseManager.transaction.success();
+	}
+
 	static void endTransaction() {
 		DatabaseManager.transaction.close();
 		DatabaseManager.transaction = null;
+	}
+
+	static void shutdownDatabase() {
+		if (DatabaseManager.database != null) {
+			DatabaseManager.database.shutdown();
+			LOGGER.info("Shut down the database.");
+			// discard the reference to this database after shutdown cause no function can be invoked on it anymore
+			DatabaseManager.database = null;
+		} else {
+			LOGGER.warn("Tried to shut down database, but there is no database opened.");
+		}
 	}
 
 	static GraphDatabaseService getDatabase() {
@@ -81,7 +110,7 @@ class DatabaseManager {
 
 
 	static Node createPageNode(int namespaceID, int pageID, String title, String htmlContent) {
-		try {
+		try (Transaction transaction = DatabaseManager.database.beginTx()) {
 			Label label = null;
 
 			if (namespaceID == 0) {
@@ -90,62 +119,149 @@ class DatabaseManager {
 				label = Label.label("Category");
 			}
 
-			Node pageNode = database.createNode(label);
+			Node pageNode = DatabaseManager.database.createNode(label);
 			pageNode.setProperty("Title", title);
 			pageNode.setProperty("NamespaceID", namespaceID);
 			pageNode.setProperty("PageID", pageID);
-			pageNode.setProperty("htmlContent", htmlContent);
+			pageNode.setProperty("HtmlContent", htmlContent);
 
-			DatabaseManager.transaction.success();
+			transaction.success();
+
 
 			return pageNode;
-		} catch (NotInTransactionException e) {
-			LOGGER.error("Tried to create a Node in the database without starting a transaction first", e);
-			throw e;
 		} catch (Exception e) {
-			// if anything other went wrong mark transaction as failed so it will be rolled back when closed
-			// even if success() is called afterwards, the whole transaction will still be rolled back
+			// if anything went wrong the transaction in this method will fail and either it or a transaction
+			// containing it will be rolled back even if success() is called afterwards for this or the containing
+			// transaction
+			LOGGER.error("Error while creating page node in database, transaction will be rolled back", e);
+			throw e;
+		}
+	}
+
+	static void createRelationship(Node startNode, Node endNode, RelationshipType relationshipType) {
+		try (Transaction transaction = DatabaseManager.database.beginTx()) {
+			startNode.createRelationshipTo(endNode, relationshipType);
+
+			transaction.success();
+		} catch (Exception e) {
+			// if anything went wrong the transaction in this method will fail and either it or a transaction
+			// containing it will be rolled back even if success() is called afterwards for this or the containing
+			// transaction
 			LOGGER.error("Error while creating Page in database, transaction will be rolled back", e);
-			DatabaseManager.transaction.failure();
 			throw e;
 		}
 	}
 
 	static Object getPropertyFromNode(Node node, String propertyToGet) {
-		try {
+		try (Transaction transaction = DatabaseManager.database.beginTx()) {
 			Object property = node.getProperty(propertyToGet);
 			transaction.success();
 			return property;
-		} catch (NotInTransactionException e) {
-			LOGGER.error("Tried to create a Node in the database without starting a transaction first", e);
-			throw e;
 		} catch (Exception e) {
-			// if anything other went wrong mark transaction as failed so it will be rolled back when closed
-			// even if success() is called afterwards, the whole transaction will still be rolled back
-			LOGGER.error("Error while creating Page in database, transaction will be rolled back", e);
-			DatabaseManager.transaction.failure();
+			// if anything went wrong the transaction in this method will fail and either it or a transaction
+			// containing it will be rolled back even if success() is called afterwards for this or the containing
+			// transaction
+			LOGGER.error("Error while getting property from node in database, transaction will be rolled back",
+					e);
 			throw e;
 		}
 	}
 
-	static Node getPageByPageIDAndNamespaceID(int pageID, int namespaceID) {
+	static Page getPageByPageIDAndNamespaceID(int pageID, int namespaceID) {
 		Node resultNode = null;
 
-		if (namespaceID == 0) {
-			Label articleLabel = Label.label("Article");
-			resultNode = DatabaseManager.database.findNode(articleLabel, "PageID", pageID);
+		try (Transaction transaction = DatabaseManager.database.beginTx()) {
+			if (namespaceID == 0) {
+				Label articleLabel = Label.label("Article");
+				resultNode = DatabaseManager.database.findNode(articleLabel, "PageID", pageID);
 			} else if (namespaceID == 14) {
-			Label categoryLabel = Label.label("Category");
-			resultNode = DatabaseManager.database.findNode(categoryLabel, "PageID", pageID);
+				Label categoryLabel = Label.label("Category");
+				resultNode = DatabaseManager.database.findNode(categoryLabel, "PageID", pageID);
 			}
+			transaction.success();
+		} catch (Exception e) {
+			// if anything went wrong the transaction in this method will fail and either it or a transaction
+			// containing it will be rolled back even if success() is called afterwards for this or the containing
+			// transaction
+			LOGGER.error("Error while searching for Page by PageID and NamespaceID in database, transaction" +
+					"will be rolled back", e);
+			throw e;
+		}
 
-		return resultNode;
+		if (resultNode != null) {
+			return new Page(resultNode);
+		} else {
+			return null;
+		}
 	}
 
-	static Node searchForNamespaceIDAndTitle(int namespaceID, String title) {
+	static ArrayList<Page> getAllArticlePages() {
+		ArrayList<Page> allArticlePages;
+
+		try (Transaction transaction = database.beginTx()) {
+
+			ResourceIterator<Node> articleNodes = DatabaseManager.database.findNodes(Label.label("Article"));
+			allArticlePages = DatabaseManager.createPagesFromResourceIterator(articleNodes);
+			transaction.success();
+		} catch (Exception e) {
+			// if anything went wrong the transaction in this method will fail and either it or a transaction
+			// containing it will be rolled back even if success() is called afterwards for this or the containing
+			// transaction
+			LOGGER.error("Error while getting all article pages, transaction will be rolled back", e);
+			throw e;
+		}
+		return allArticlePages;
+	}
+
+	static ArrayList<Page> getAllPages() {
+
+		ArrayList<Page> allPages = new ArrayList<>();
+
+		try (Transaction transaction = database.beginTx()) {
+
+			Result allNodes = DatabaseManager.database.execute("MATCH (page) RETURN page;");
+
+			while (allNodes.hasNext()) {
+				Map<String, Object> currentRow = allNodes.next();
+				Node currentNode = (Node) currentRow.get("page");
+
+				try {
+					allPages.add(new Page(currentNode));
+				} catch (IllegalArgumentException e) {
+					LOGGER.error("Creating Page with empty node failed, ResourceIterator shouldn't contain empty" +
+							"nodes");
+				}
+			}
+			transaction.success();
+			return allPages;
+		} catch (Exception e) {
+			// if anything went wrong the transaction in this method will fail and either it or a transaction
+			// containing it will be rolled back even if success() is called afterwards for this or the containing
+			// transaction
+			LOGGER.error("Error while getting all pages, transaction will be rolled back", e);
+			throw e;
+		}
+	}
+
+
+	private static ArrayList<Page> createPagesFromResourceIterator(ResourceIterator<Node> resourceIterator) {
+		ArrayList<Page> result = new ArrayList<>();
+		while (resourceIterator.hasNext()) {
+			Node currentNode = resourceIterator.next();
+			try {
+				result.add(new Page(currentNode));
+			} catch (IllegalArgumentException e) {
+				LOGGER.error("Creating Page with empty node failed, ResourceIterator shouldn't contain empty" +
+						"nodes");
+			}
+		}
+		return result;
+	}
+
+	static Page getPageByNamespaceIDAndTitle(int namespaceID, String title) {
+		Node resultNode = null;
 		try (Transaction transaction = database.beginTx()) {
 			Label label = null;
-			Node node = null;
 
 			if (namespaceID == 0) {
 				label = Label.label("Article");
@@ -155,10 +271,18 @@ class DatabaseManager {
 			Iterator<Node> i = database.findNodes(label, "Title", title);
 
 			if (i.hasNext()) {
-				node = i.next();
+				resultNode = i.next();
 			}
-
-			return node;
+			transaction.success();
 		}
+		if (resultNode != null) {
+			return new Page(resultNode);
+		} else {
+			return null;
+		}
+	}
+
+	static Map<String, String> getPageInfoByNamespaceIDAndTitle() {
+		return null;
 	}
 }

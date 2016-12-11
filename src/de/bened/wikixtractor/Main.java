@@ -7,13 +7,13 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashSet;
 
 /**
  * <h1>Main</h1>
  * Handles user input on command line, calls extraction of pages and calls writing to xml file
  *
  * @author xuiqzy
+ * @author symdox
  * @since 07.11.2016
  */
 class Main {
@@ -30,23 +30,30 @@ class Main {
 
 		if (args.length == 2) {
 
+			// TODO validate arguments before calling functions
+			File databaseDirectory = new File(args[1]);
+
 			switch (args[0]) {
 				case "reset":
-					File pathToDatabaseDirectory = new File(args[1]);
 					try {
-						DatabaseManager.deleteDatabase(pathToDatabaseDirectory);
+						DatabaseManager.deleteDatabase(databaseDirectory);
 						LOGGER.info("Successfully dropped database.");
-						DatabaseManager.initialize(pathToDatabaseDirectory);
+						DatabaseManager.initialize(databaseDirectory);
 						LOGGER.info("Successfully created a new database.");
 					} catch (Exception e) {
-						LOGGER.error("No database found. Try another path.");
+						// error while deleting or initializing database (creating indices and waiting for them to come
+						// online), already handled in DatabaseManager
+						DatabaseManager.shutdownDatabase();
+						System.exit(-1);
 					}
 					break;
 				case "categorylinks":
-					// TODO create categorylinks function
+					DatabaseManager.initialize(databaseDirectory);
+					LinkExtractor.extractCategoryLinks();
 					break;
 				case "articlelinks":
-					// TODO create articlelinks function
+					DatabaseManager.initialize(databaseDirectory);
+					LinkExtractor.extractArticleLinks();
 					break;
 				default:
 					argumentFail();
@@ -54,13 +61,13 @@ class Main {
 			}
 		} else if (args.length == 3) {
 
+			File databaseDirectory = new File(args[1]);
+
 			if (args[0].equals("importhtml")) {
-				File pathToDatabaseDirectory = new File(args[1]);
 				Path pathToWikipediaFile = Paths.get(args[2]);
 
-				HashSet<Page> pages = new HashSet<>();
 				try {
-					DatabaseManager.initialize(pathToDatabaseDirectory);
+					DatabaseManager.initialize(databaseDirectory);
 					PageFactory.extractPages(pathToWikipediaFile);
 				} catch (IOException e) {
 					// already handled in PageFactory.extractPages(), but abort program now and don't export anything
@@ -71,14 +78,17 @@ class Main {
 			}
 		} else if (args.length == 4) {
 
+			File databaseDirectory = new File(args[1]);
+
 			if (args[0].equals("pageinfo")) {
-				// TODO create pageinfo function
+				// TODO create and use pageinfo function
 			} else {
 				argumentFail();
 			}
 		} else {
 			argumentFail();
 		}
+		DatabaseManager.shutdownDatabase();
 	}
 
 	static private void argumentFail() {
