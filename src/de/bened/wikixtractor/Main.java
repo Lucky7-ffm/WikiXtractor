@@ -37,9 +37,7 @@ class Main {
 				case "reset":
 					try {
 						DatabaseManager.deleteDatabase(databaseDirectory);
-						LOGGER.info("Successfully dropped database.");
 						DatabaseManager.initialize(databaseDirectory);
-						LOGGER.info("Successfully created a new database.");
 					} catch (Exception e) {
 						// error while deleting or initializing database (creating indices and waiting for them to come
 						// online), already handled in DatabaseManager

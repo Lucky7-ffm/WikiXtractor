@@ -67,6 +67,8 @@ class PageFactory {
 						namespaceID = Integer.valueOf(splittedHeaderOfPage[2]);
 						title = splittedHeaderOfPage[3];
 
+						// validate that namespaceID is only 0 or 14 so we can assert that when working with the data in
+						// the database later
 						if (namespaceID != 0 && namespaceID != 14) {
 							headerInfoParsed = false;
 							continue;

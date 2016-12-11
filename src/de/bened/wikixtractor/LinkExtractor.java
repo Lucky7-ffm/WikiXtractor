@@ -37,8 +37,9 @@ class LinkExtractor {
 				Page category = DatabaseManager.getPageByNamespaceIDAndTitle(14, currentCategoryTitle);
 				if (category != null) {
 					currentPage.addCategory(category);
+					LOGGER.info("Category \"" + category.getTitle() + "\" to \"" + currentPage.getTitle() + "\" added.");
 				} else {
-					LOGGER.info("Category \"" + currentCategoryTitle + "\" isn't in database, therefore it can't be " +
+					LOGGER.debug("Category \"" + currentCategoryTitle + "\" isn't in database, therefore it can't be " +
 							"added as category of the Page \"" + currentPage.getTitle() + "\"");
 				}
 			}
@@ -58,9 +59,9 @@ class LinkExtractor {
 		// Looks for the div with catlinks as id and takes every a element with an href attribute under that.
 		Elements allLinks = documentToParse.select("div[id=catlinks] a[href]");
 
-		//Adds every link text from the category links into a Set of Strings
+		//Adds every link title from the category links into a Set of Strings
 		for (Element link : allLinks) {
-			categoryTitles.add(link.text());
+			categoryTitles.add(link.attr("title"));
 		}
 
 		return categoryTitles;
@@ -76,6 +77,8 @@ class LinkExtractor {
 				Page articlePageLinksTo = DatabaseManager.getPageByNamespaceIDAndTitle(0, currentArticleLinkTitle);
 				if (articlePageLinksTo != null) {
 					currentPage.addLinkToArticle(articlePageLinksTo);
+					LOGGER.info("Article link from \"" + currentPage.getTitle() + "\" to \" " +
+							articlePageLinksTo.getTitle() + "\" added.");
 				} else {
 					LOGGER.debug("Page \"" + currentArticleLinkTitle + "\" isn't in database, therefore it can't " +
 							"be added as a linked article of the Page \"" + currentPage.getTitle() + "\"");
@@ -93,9 +96,9 @@ class LinkExtractor {
 		// Looks for every a element where the href attribute begins with /wiki/
 		Elements allLinks = documentToParse.select("a[href^=/wiki/]");
 
-		//Adds every link text from the article links into a Set of Strings
+		//Adds every link title from the article links into a Set of Strings
 		for (Element link : allLinks) {
-			articleTitles.add(link.text());
+			articleTitles.add(link.attr("title"));
 		}
 
 		return articleTitles;

@@ -44,6 +44,12 @@ class DatabaseManager {
 		// create or reopen database
 		DatabaseManager.database = new GraphDatabaseFactory().newEmbeddedDatabase(DatabaseManager.databaseDirectory);
 
+		if (isNewlyCreatedDatabase) {
+			LOGGER.info("Successfully created database.");
+		} else {
+			LOGGER.info("Successfully reopened database.");
+		}
+
 		try (Transaction transaction = database.beginTx()) {
 			// index properties of labels for quicker queries and traversal after database is first created
 			if (isNewlyCreatedDatabase) {
@@ -58,6 +64,8 @@ class DatabaseManager {
 			// always wait for indices to become online
 			database.schema().awaitIndexesOnline(15, TimeUnit.SECONDS);
 
+			LOGGER.info("Successfully initialized database.");
+
 			transaction.success();
 
 		} catch (Exception e) {
@@ -70,6 +78,7 @@ class DatabaseManager {
 	static void deleteDatabase(File databaseDirectory) throws IOException {
 		if (databaseDirectory.exists()) try {
 			FileUtils.deleteRecursively(databaseDirectory);
+			LOGGER.info("Successfully dropped database.");
 		} catch (IOException e) {
 			LOGGER.error("Can't delete old database", e);
 			throw e;
