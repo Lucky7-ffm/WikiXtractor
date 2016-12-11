@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
  * Controls the NEO4J database
  *
  * @author xuiqzy
+ * @author doudou
  * @author symdox
  * @since 27.11.2016
  */

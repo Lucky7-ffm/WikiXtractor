@@ -11,7 +11,7 @@ import java.util.Set;
 
 /**
  * <h1>Main</h1>
- * Handles user input on command line, calls extraction of pages and calls writing to xml file
+ * Handles user input on command line, calls extraction of information and info about a page.
  *
  * @author xuiqzy
  * @author symdox
@@ -25,7 +25,8 @@ class Main {
 	private final static Logger LOGGER = LogManager.getLogger(Main.class);
 
 	/**
-	 * @param args first one is path to input file to be parsed, second one is output path to xml file to be created
+	 * @param args first is mode of operation, second is the database directory, third and forth is dependant on the
+	 *             mode of operation
 	 */
 	public static void main(String[] args) {
 
@@ -49,7 +50,7 @@ class Main {
 					LinkExtractor.extractArticleLinks();
 					break;
 				default:
-					argumentFail();
+					incorrectArgumentsFound();
 					break;
 			}
 		} else if (args.length == 3) {
@@ -67,7 +68,7 @@ class Main {
 					System.exit(-1);
 				}
 			} else {
-				argumentFail();
+				incorrectArgumentsFound();
 			}
 		} else if (args.length == 4) {
 
@@ -88,12 +89,12 @@ class Main {
 					System.exit(-1);
 				}
 				String title = args[3];
-				pageInfo(namespaceID, title);
+				printInfoAboutPage(namespaceID, title);
 			} else {
-				argumentFail();
+				incorrectArgumentsFound();
 			}
 		} else {
-			argumentFail();
+			incorrectArgumentsFound();
 		}
 		DatabaseManager.shutdownDatabase();
 	}
@@ -111,12 +112,19 @@ class Main {
 		}
 	}
 
-	private static void argumentFail() {
-		LOGGER.error("Incorrect argument: Please check Readme to check valid arguments");
+	private static void incorrectArgumentsFound() {
+		LOGGER.error("Incorrect arguments: Please check Readme to check valid arguments!");
 		System.exit(-1);
 	}
 
-	static private void pageInfo(int namespaceID, String title) {
+	/**
+	 * Prints the following information about the specified page (if it exists):
+	 * categories of the page
+	 * categories of the page and categories of that category (recursively)
+	 * articles this page links to
+	 * articles which link to this page
+	 */
+	static private void printInfoAboutPage(int namespaceID, String title) {
 		DatabaseManager.startTransaction();
 
 		Page startPage = DatabaseManager.getPageByNamespaceIDAndTitle(namespaceID, title);

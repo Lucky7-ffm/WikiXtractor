@@ -77,7 +77,7 @@ class LinkExtractor {
 				Page articlePageLinksTo = DatabaseManager.getPageByNamespaceIDAndTitle(0, currentArticleLinkTitle);
 				if (articlePageLinksTo != null) {
 					currentPage.addLinkToArticle(articlePageLinksTo);
-					LOGGER.info("Article link from \"" + currentPage.getTitle() + "\" to \" " +
+					LOGGER.debug("Article link from \"" + currentPage.getTitle() + "\" to \" " +
 							articlePageLinksTo.getTitle() + "\" added.");
 				} else {
 					LOGGER.debug("Page \"" + currentArticleLinkTitle + "\" isn't in database, therefore it can't " +
