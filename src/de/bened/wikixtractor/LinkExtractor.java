@@ -93,6 +93,9 @@ class LinkExtractor {
 		Set<String> articleTitles = new HashSet<>();
 		Document documentToParse = Jsoup.parse(htmlPage);
 
+		// TODO exclude category links! the whole thing only works nearly cause we search only for existing *articles*
+		// in the database, but this fails when a category which is found is found as an article in the database
+
 		// Looks for every a element where the href attribute begins with /wiki/
 		Elements allLinks = documentToParse.select("a[href^=/wiki/]");
 
