@@ -28,6 +28,7 @@ class LinkExtractor {
 	private final static Logger LOGGER = LogManager.getLogger(LinkExtractor.class);
 
 	static void extractCategoryLinks() {
+		DatabaseManager.startTransaction();
 		ArrayList<Page> allPages = DatabaseManager.getAllPages();
 		LOGGER.info("Read all pages from database for extraction of categories of the pages.");
 		for (Page currentPage : allPages) {
@@ -46,6 +47,8 @@ class LinkExtractor {
 			LOGGER.info("Relationship from Page \"" + currentPage.getTitle() + "\" to all categories that are in the" +
 					"database added ");
 		}
+		DatabaseManager.markTransactionSuccessful();
+		DatabaseManager.endTransaction();
 	}
 
 	/**
@@ -68,6 +71,7 @@ class LinkExtractor {
 	}
 
 	static void extractArticleLinks() {
+		DatabaseManager.startTransaction();
 		ArrayList<Page> allArticlePages = DatabaseManager.getAllArticlePages();
 		LOGGER.info("Read all article pages from database for extraction of links to other articles.");
 		for (Page currentPage : allArticlePages) {
@@ -87,6 +91,8 @@ class LinkExtractor {
 			LOGGER.info("Relationship from Page \"" + currentPage.getTitle() + "\" to all pages it links to " +
 					"that are in the database added ");
 		}
+		DatabaseManager.endTransaction();
+		DatabaseManager.endTransaction();
 	}
 
 	private static Set<String> extractArticleLinksFromHtmlString(String htmlPage) {
