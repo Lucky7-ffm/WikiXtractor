@@ -91,7 +91,7 @@ class LinkExtractor {
 			LOGGER.info("Relationship from Page \"" + currentPage.getTitle() + "\" to all pages it links to " +
 					"that are in the database added ");
 		}
-		DatabaseManager.endTransaction();
+		DatabaseManager.markTransactionSuccessful();
 		DatabaseManager.endTransaction();
 	}
 
