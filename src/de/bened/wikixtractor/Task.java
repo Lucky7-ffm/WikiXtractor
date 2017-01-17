@@ -1,7 +1,6 @@
 package de.bened.wikixtractor;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import de.bened.wikixtractor.TaskScheduler.TaskType;
 
 /**
  * <h1>Task (Abstract)</h1>
@@ -13,14 +12,11 @@ import org.apache.logging.log4j.Logger;
 
 abstract class Task {
 
-    final static Logger LOGGER = LogManager.getLogger(Main.class);
+    static TaskType[] precondition = null;
+    static TaskType[] postcondition = null;
 
-    public abstract String getDescription();
+    abstract String getDescription();
 
-    public abstract void run(String[] args);
-
-    public abstract boolean previouslyTasks();
-
-    public abstract String nextTask();
+    abstract void run(String[] args);
 
 }

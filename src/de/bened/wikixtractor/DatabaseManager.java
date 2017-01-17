@@ -160,6 +160,44 @@ class DatabaseManager {
 		}
 	}
 
+	static void createInfoNode(String[] orderOfEvents){
+        try (Transaction transaction = DatabaseManager.database.beginTx()) {
+            Node infoNode = DatabaseManager.database.createNode(Label.label("ExecutedTasks"));
+            infoNode.setProperty("HTMLDumpImport", false);
+            infoNode.setProperty("CategoryLinkExtraction", false);
+            infoNode.setProperty("ArticleLinkExtraction", false);
+            infoNode.setProperty("EntityBaseExtraction", false);
+            infoNode.setProperty("PersonExtraction", false);
+            infoNode.setProperty("CityExtraction", false);
+            infoNode.setProperty("MonumentExtraction", false);
+
+            transaction.success();
+        } catch (Exception e) {
+            // if anything went wrong the transaction in this method will fail and either it or a transaction
+            // containing it will be rolled back even if success() is called afterwards for this or the containing
+            // transaction
+            LOGGER.error("Error while creating page node in database, transaction will be rolled back!", e);
+            throw e;
+        }
+
+    }
+
+    static void setExecutedTaskTrue(String executedTask) {
+        try (Transaction transaction = DatabaseManager.database.beginTx()) {
+
+            Node taskNode = DatabaseManager.database.findNode(Label.label("ExecutedTasks"), executedTask, false);
+            taskNode.setProperty(executedTask, true);
+
+            transaction.success();
+        } catch (Exception e) {
+            // if anything went wrong the transaction in this method will fail and either it or a transaction
+            // containing it will be rolled back even if success() is called afterwards for this or the containing
+            // transaction
+            LOGGER.error("Error while creating page node in database, transaction will be rolled back!", e);
+            throw e;
+        }
+    }
+
 	static void createRelationship(Node startNode, Node endNode, org.neo4j.graphdb.RelationshipType relationshipType) {
 		try (Transaction transaction = DatabaseManager.database.beginTx()) {
 			startNode.createRelationshipTo(endNode, relationshipType);
