@@ -69,9 +69,11 @@ class TaskScheduler {
 
 
 	private static ArrayList<TaskType> currentTasks;
+	private static ArrayList<String> currentTasksNames;
+	private static ArrayList<String> currentTasksArguments;
 
 
-	private static boolean validateTasks(String[] tasks) {
+	private static boolean validateTasks(ArrayList<String> tasks) {
 		// validate that all the names correspond to existing tasks
 		for (String task : tasks) {
 			if (!taskNameTaskClassMap.containsKey(task)) {
@@ -92,6 +94,7 @@ class TaskScheduler {
 				preconditionsOfCurrentTask.add((TaskType) taskClass.getField("preconditions").get(TaskScheduler.class));
 			} catch (NoSuchFieldException | IllegalAccessException e) {
 				// shouldn't occur
+				LOGGER.error(e);
 				return false;
 			}
 
@@ -116,6 +119,7 @@ class TaskScheduler {
 				preconditionsOfCurrentTask.add((TaskType) taskClass.getField("postconditions").get(TaskScheduler.class));
 			} catch (NoSuchFieldException | IllegalAccessException e) {
 				// shouldn't occur
+				LOGGER.error(e);
 				return false;
 			}
 
@@ -141,8 +145,43 @@ class TaskScheduler {
 	}
 
 	private static boolean runTasksFromNames(String[] tasks) {
+
+		// strip arguments from task list
+		for (String task : tasks) {
+			String[] taskWithArguments = task.split(" ", 2);
+			currentTasksNames.add(taskWithArguments[0]);
+			if (taskWithArguments.length > 1) {
+				currentTasksArguments.add(taskWithArguments[1]);
+			} else {
+				currentTasksArguments.add("");
+			}
+		}
+
 		// return false if validation failed
-		return validateTasks(tasks);
+		if (!validateTasks(TaskScheduler.currentTasksNames)) {
+			return false;
+		}
+
+		int iteration = 0;
+		for (TaskType currentTask : TaskScheduler.currentTasks) {
+			Class taskClass = taskTypeTaskClassMap.get(currentTask);
+			Task taskToRun = null;
+			try {
+				taskToRun = (Task) taskClass.newInstance();
+			} catch (InstantiationException | IllegalAccessException e) {
+				// shouldn't occur
+				LOGGER.error(e);
+			}
+			if (taskToRun != null) {
+				String[] taskArguments = new String[0];
+				if (TaskScheduler.currentTasksArguments.get(0).isEmpty()) {
+					taskToRun.run(taskArguments);
+				}
+			}
+			iteration++;
+		}
+
+		return true;
 	}
 
 }
