@@ -68,9 +68,9 @@ class TaskScheduler {
 	}
 
 
-	private static ArrayList<TaskType> currentTasks;
-	private static ArrayList<String> currentTasksNames;
-	private static ArrayList<String> currentTasksArguments;
+	private static ArrayList<TaskType> currentTasks = new ArrayList<>();
+	private static ArrayList<String> currentTasksNames = new ArrayList<>();
+	private static ArrayList<String> currentTasksArguments = new ArrayList<>();
 
 
 	private static boolean validateTasks(ArrayList<String> tasks) {
@@ -112,6 +112,7 @@ class TaskScheduler {
 				LOGGER.error("Not all preconditions of task \"" + currentTask + "\" are met!");
 				return false;
 			}
+			LOGGER.debug("All preconditions of task \"" + currentTask + "\" are met!");
 
 			// get postconditions of current task
 			ArrayList<TaskType> postconditionsOfCurrentTask = new ArrayList<>();
@@ -140,11 +141,12 @@ class TaskScheduler {
 				LOGGER.error("Not all postconditions of task \"" + currentTask + "\" are met!");
 				return false;
 			}
+			LOGGER.debug("All postconditions of task \"" + currentTask + "\" are met!");
 		}
 		return true;
 	}
 
-	private static boolean runTasksFromNames(String[] tasks) {
+	static boolean runTasksFromNames(ArrayList<String> tasks) {
 
 		// strip arguments from task list
 		for (String task : tasks) {
@@ -159,8 +161,10 @@ class TaskScheduler {
 
 		// return false if validation failed
 		if (!validateTasks(TaskScheduler.currentTasksNames)) {
+			LOGGER.error("Not all pre- and postconditions of the tasks are met!");
 			return false;
 		}
+		LOGGER.info("All pre- and postconditions of the tasks are met!");
 
 		int iteration = 0;
 		for (TaskType currentTask : TaskScheduler.currentTasks) {
