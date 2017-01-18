@@ -342,6 +342,7 @@ class DatabaseManager {
 	}
 
 
+
 	/**
 	 * @param startPage            start point of graph traversal
 	 * @param pageRelationshipType either hasCategory or linksTo of enum type PageRelationshipType

@@ -6,8 +6,8 @@ import org.apache.logging.log4j.Logger;
 
 
 /**
- * <h1>EntityBaseExtraction</h1>
- * TODO BLABLABLA
+ * <h1>EntityLink</h1>
+ * Creates a relationship between related entities
  *
  * @author symdox
  * @since 17.01.2017
@@ -22,7 +22,7 @@ class EntityLinks extends Task {
 
 
     @Override String getDescription(){
-        return "XYZ";
+        return "Creates a relationship between related entities";
     }
 
     @Override void run(String[] args){
