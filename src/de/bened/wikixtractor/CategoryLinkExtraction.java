@@ -15,10 +15,10 @@ import org.apache.logging.log4j.Logger;
 
 class CategoryLinkExtraction extends Task {
 
-    final static Logger LOGGER = LogManager.getLogger(CategoryLinkExtraction.class);
+	private final static Logger LOGGER = LogManager.getLogger(CategoryLinkExtraction.class);
 
-    private TaskType[] precondition = {TaskType.HTMLDumpImport};
-    private TaskType[] postcondition = {};
+	private TaskType[] preconditions = {TaskType.HTMLDumpImport};
+	private TaskType[] postconditions = {};
 
 
     @Override String getDescription(){

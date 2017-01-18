@@ -31,7 +31,7 @@ class PageExport {
 	/**
 	 * logging object for this class
 	 */
-	private final static Logger LOGGER = LogManager.getLogger(LinkExtractor.class);
+	private final static Logger LOGGER = LogManager.getLogger(PageExport.class);
 
 	/**
 	 * @param pages         pages to be written in the xml file

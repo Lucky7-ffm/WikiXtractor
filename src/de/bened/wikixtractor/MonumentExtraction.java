@@ -15,10 +15,10 @@ import org.apache.logging.log4j.Logger;
 
 class MonumentExtraction extends Task {
 
-    final static Logger LOGGER = LogManager.getLogger(MonumentExtraction.class);
+	private final static Logger LOGGER = LogManager.getLogger(MonumentExtraction.class);
 
-    private TaskType[] precondition = {TaskType.HTMLDumpImport, TaskType.CategoryLinkExtraction, TaskType.EntityBaseExtraction};
-    private TaskType[] postcondition = {};
+	private TaskType[] preconditions = {TaskType.HTMLDumpImport, TaskType.CategoryLinkExtraction, TaskType.EntityBaseExtraction};
+	private TaskType[] postconditions = {};
 
 
     @Override String getDescription(){

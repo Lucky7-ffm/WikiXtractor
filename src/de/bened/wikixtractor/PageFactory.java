@@ -22,7 +22,7 @@ class PageFactory {
 	/**
 	 * logging object for this class
 	 */
-	private final static Logger LOGGER = LogManager.getLogger(LinkExtractor.class);
+	private final static Logger LOGGER = LogManager.getLogger(PageFactory.class);
 	/**
 	 * symbol on which pages are separated and on which page metadata header starts
 	 */

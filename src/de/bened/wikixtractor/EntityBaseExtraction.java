@@ -15,10 +15,10 @@ import org.apache.logging.log4j.Logger;
 
 class EntityBaseExtraction extends Task {
 
-    final static Logger LOGGER = LogManager.getLogger(EntityBaseExtraction.class);
+	private final static Logger LOGGER = LogManager.getLogger(EntityBaseExtraction.class);
 
-    private TaskType[] precondition = {TaskType.HTMLDumpImport, TaskType.CategoryLinkExtraction};
-    private TaskType[] postcondition = {TaskType.EntityLinks};
+	private TaskType[] preconditions = {TaskType.HTMLDumpImport, TaskType.CategoryLinkExtraction};
+	private TaskType[] postconditions = {TaskType.EntityLinks};
 
 
     @Override String getDescription(){

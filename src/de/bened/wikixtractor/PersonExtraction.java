@@ -15,10 +15,10 @@ import org.apache.logging.log4j.Logger;
 
 class PersonExtraction extends Task {
 
-    final static Logger LOGGER = LogManager.getLogger(PersonExtraction.class);
+	private final static Logger LOGGER = LogManager.getLogger(PersonExtraction.class);
 
-    private TaskType[] precondition = {TaskType.HTMLDumpImport, TaskType.CategoryLinkExtraction, TaskType.EntityBaseExtraction};
-    private TaskType[] postcondition = {};
+	private TaskType[] preconditions = {TaskType.HTMLDumpImport, TaskType.CategoryLinkExtraction, TaskType.EntityBaseExtraction};
+	private TaskType[] postconditions = {};
 
 
     @Override String getDescription(){
