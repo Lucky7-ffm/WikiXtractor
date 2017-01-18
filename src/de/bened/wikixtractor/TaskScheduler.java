@@ -15,6 +15,8 @@ import java.util.Map;
  * Control class of all Task
  *
  * @author symdox
+ * @author doudou
+ * @author xuiqzy
  * @since 16.01.2017
  */
 

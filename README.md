@@ -1,6 +1,6 @@
 #WikiXtractor
 
-**!!DON'T WORKING!!**
+**!!NOT FULLY WORKING!!**
 
 Running:
 -------------
