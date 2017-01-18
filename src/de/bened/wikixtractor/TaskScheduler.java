@@ -4,6 +4,7 @@ package de.bened.wikixtractor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -89,9 +90,18 @@ class TaskScheduler {
 
 			// get preconditions of current task
 			Class taskClass = taskTypeTaskClassMap.get(currentTask);
+			Object taskObject = null;
+			try {
+				taskObject = taskClass.newInstance();
+			} catch (InstantiationException | IllegalAccessException e) {
+				// shouldn't occur
+				LOGGER.error(e);
+			}
 			ArrayList<TaskType> preconditionsOfCurrentTask = new ArrayList<>();
 			try {
-				preconditionsOfCurrentTask.add((TaskType) taskClass.getField("preconditions").get(TaskScheduler.class));
+				Field temp = taskClass.getDeclaredField("preconditions");
+				temp.setAccessible(true);
+				preconditionsOfCurrentTask.add((TaskType) temp.get(taskObject));
 			} catch (NoSuchFieldException | IllegalAccessException e) {
 				// shouldn't occur
 				LOGGER.error(e);
@@ -117,7 +127,9 @@ class TaskScheduler {
 			// get postconditions of current task
 			ArrayList<TaskType> postconditionsOfCurrentTask = new ArrayList<>();
 			try {
-				preconditionsOfCurrentTask.add((TaskType) taskClass.getField("postconditions").get(TaskScheduler.class));
+				Field temp = taskClass.getDeclaredField("postconditions");
+				temp.setAccessible(true);
+				postconditionsOfCurrentTask.add((TaskType) temp.get(taskObject));
 			} catch (NoSuchFieldException | IllegalAccessException e) {
 				// shouldn't occur
 				LOGGER.error(e);

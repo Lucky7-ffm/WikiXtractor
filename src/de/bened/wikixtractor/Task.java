@@ -12,8 +12,8 @@ import de.bened.wikixtractor.TaskScheduler.TaskType;
 
 abstract class Task {
 
-    static TaskType[] precondition = null;
-    static TaskType[] postcondition = null;
+    static TaskType[] preconditions = null;
+    static TaskType[] postconditions = null;
 
     abstract String getDescription();
 

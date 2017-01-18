@@ -17,8 +17,8 @@ class CategoryLinkExtraction extends Task {
 
 	private final static Logger LOGGER = LogManager.getLogger(CategoryLinkExtraction.class);
 
-	private TaskType[] preconditions = {TaskType.HTMLDumpImport};
-	private TaskType[] postconditions = {};
+	TaskType[] preconditions = {TaskType.HTMLDumpImport};
+	TaskType[] postconditions = {};
 
 
     @Override String getDescription(){

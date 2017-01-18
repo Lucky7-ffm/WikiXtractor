@@ -17,8 +17,8 @@ class CityExtraction extends Task {
 
 	private final static Logger LOGGER = LogManager.getLogger(CityExtraction.class);
 
-	private TaskType[] preconditions = {TaskType.HTMLDumpImport, TaskType.CategoryLinkExtraction, TaskType.EntityBaseExtraction};
-	private TaskType[] postconditions = {};
+	TaskType[] preconditions = {TaskType.HTMLDumpImport, TaskType.CategoryLinkExtraction, TaskType.EntityBaseExtraction};
+	TaskType[] postconditions = {};
 
 
     @Override String getDescription(){

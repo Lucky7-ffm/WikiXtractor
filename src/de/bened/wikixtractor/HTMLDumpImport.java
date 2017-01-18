@@ -19,6 +19,9 @@ class HTMLDumpImport extends Task {
 
     private final static Logger LOGGER = LogManager.getLogger(HTMLDumpImport.class);
 
+	TaskScheduler.TaskType[] preconditions = null;
+	TaskScheduler.TaskType[] postconditions = null;
+
     @Override String getDescription(){
         return "Creates a new Database with the given HTML dump data";
     }

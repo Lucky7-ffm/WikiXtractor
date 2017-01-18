@@ -17,8 +17,8 @@ class EntityBaseExtraction extends Task {
 
 	private final static Logger LOGGER = LogManager.getLogger(EntityBaseExtraction.class);
 
-	private TaskType[] preconditions = {TaskType.HTMLDumpImport, TaskType.CategoryLinkExtraction};
-	private TaskType[] postconditions = {TaskType.EntityLinks};
+	TaskType[] preconditions = {TaskType.HTMLDumpImport, TaskType.CategoryLinkExtraction};
+	TaskType[] postconditions = {TaskType.EntityLinks};
 
 
     @Override String getDescription(){

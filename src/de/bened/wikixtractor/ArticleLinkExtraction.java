@@ -17,8 +17,8 @@ class ArticleLinkExtraction extends Task {
 
     private final static Logger LOGGER = LogManager.getLogger(ArticleLinkExtraction.class);
 
-    private TaskType[] preconditions = {TaskType.HTMLDumpImport};
-    private TaskType[] postconditions = {};
+    TaskType[] preconditions = {TaskType.HTMLDumpImport};
+    TaskType[] postconditions = {};
 
 
     @Override String getDescription() { return "Extracts all article links from the HTML dump data"; }
