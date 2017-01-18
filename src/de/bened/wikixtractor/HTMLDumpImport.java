@@ -26,21 +26,8 @@ class HTMLDumpImport extends Task {
     @Override void run(String[] args){
         File databaseDirectory = new File(args[0]);
         Path pathToWikipediaFile = Paths.get(args[1]);
-        initializeDatabase(databaseDirectory);
 
     }
 
-    private static void initializeDatabase(File databaseDirectory) {
-        try {
-            DatabaseManager.initialize(databaseDirectory);
-        } catch (Exception e) {
-            // error while initializing database
-            // for creation of indices and waiting for them to come online, it is already handled in DatabaseManager
-            LOGGER.error("Error while initializing database, check if the database directory" +
-                    "exists and is writable!");
-            DatabaseManager.shutdownDatabase();
-            System.exit(-1);
-        }
-    }
 }
 
