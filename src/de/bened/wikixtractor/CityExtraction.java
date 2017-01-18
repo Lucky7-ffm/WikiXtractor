@@ -7,7 +7,7 @@ import org.apache.logging.log4j.Logger;
 
 /**
  * <h1>CityExtraction</h1>
- * TODO BLABLABLA
+ * Searches in all city related entities for important information and adds them to the node
  *
  * @author symdox
  * @since 17.01.2017
@@ -22,7 +22,7 @@ class CityExtraction extends Task {
 
 
     @Override String getDescription(){
-        return "XYZ";
+        return "Searches in all monument related entities for important information and adds them to the node";
     }
 
     @Override void run(String[] args){

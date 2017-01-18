@@ -7,7 +7,7 @@ import org.apache.logging.log4j.Logger;
 
 /**
  * <h1>CategoryLinkExtraction</h1>
- * TODO BLABLABLA
+ * Extracts all article links from the HTML dump data
  *
  * @author symdox
  * @since 17.01.2017
@@ -22,11 +22,11 @@ class CategoryLinkExtraction extends Task {
 
 
     @Override String getDescription(){
-        return "XYZ";
+        return "Extracts all article links from the HTML dump data";
     }
 
     @Override void run(String[] args){
-
+        LinkExtractor.extractCategoryLinks();
     }
 
 }

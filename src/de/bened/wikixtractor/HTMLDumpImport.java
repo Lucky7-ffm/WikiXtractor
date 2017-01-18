@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 
 /**
  * <h1>HTMLDumpImport</h1>
- * Creats a new Database with the given HTML-Data
+ * Creates a new Database with the given HTML dump data
  *
  * @author symdox
  * @since 16.01.2017
@@ -20,7 +20,7 @@ class HTMLDumpImport extends Task {
     private final static Logger LOGGER = LogManager.getLogger(HTMLDumpImport.class);
 
     @Override String getDescription(){
-        return "Creates a new Database with the given HTML-Data";
+        return "Creates a new Database with the given HTML dump data";
     }
 
     @Override void run(String[] args){

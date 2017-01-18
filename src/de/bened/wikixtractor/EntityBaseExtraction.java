@@ -7,7 +7,7 @@ import org.apache.logging.log4j.Logger;
 
 /**
  * <h1>EntityBaseExtraction</h1>
- * TODO BLABLABLA
+ * Search in category "Person", "Ort", "Denkmal" for all article and add them to a new entity base
  *
  * @author symdox
  * @since 16.01.2017
@@ -22,10 +22,12 @@ class EntityBaseExtraction extends Task {
 
 
     @Override String getDescription(){
-        return "XYZ";
+        return "Search in category Person, Ort and Denkmal for all article and add them to a new entity base";
     }
 
     @Override void run(String[] args){
+        DatabaseManager.startTransaction();
+
 
     }
 
