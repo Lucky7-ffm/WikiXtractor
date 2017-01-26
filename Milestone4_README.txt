@@ -19,17 +19,11 @@ Get info about the page specified via title. It prints out the title, page id an
 as direct categories, direct and indirect categories, articles it links to and articles that link to it:
 <Database-Directory> queryentity <Article-Title>
 
----
-
 How to run the calculation:
-There are no run commands in this application.
+There is no run commands in this application.
 
-
-
-Where will be the final data stored:
+Where will be the final data be stored:
 No final data will be created. So there is no data to be stored.
-
-
 
 How worked on which part of the application:
 All member of the programming team has working on all classes.
@@ -49,9 +43,7 @@ Class: PageExport: doudou, symdox
 Class: PageFactory: xuiqzy
 Class: PersonExtraction: symdox
 Class: Task: symdox
-Class: TaskScheduler: xuiqzy, doudou, symdox
-
-
+Class: TaskScheduler: xuiqzy
 
 Which problems still remain:
 Since Milestone 3 there is no progress. The application won't run.
